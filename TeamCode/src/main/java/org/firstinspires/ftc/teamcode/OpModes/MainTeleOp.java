@@ -13,14 +13,12 @@ import dev.nextftc.hardware.driving.DriverControlledCommand;
 
 @TeleOp(name = "Main TeleOp")
 public class MainTeleOp extends NextFTCOpMode {
-    public class TeleOpProgram extends NextFTCOpMode {
-        public TeleOpProgram() {
-            addComponents(
-                    BulkReadComponent.INSTANCE,
-                    BindingsComponent.INSTANCE,
-                    new PedroComponent(Constants::createFollower)
-            );
-        }
+    public MainTeleOp() {
+        addComponents(
+                BulkReadComponent.INSTANCE,
+                BindingsComponent.INSTANCE,
+                new PedroComponent(Constants::createFollower)
+        );
     }
 
     @Override
