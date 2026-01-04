@@ -7,6 +7,7 @@ import dev.nextftc.core.components.SubsystemComponent;
 import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.extensions.pedro.PedroDriverControlled;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
@@ -40,5 +41,8 @@ public class MainTeleOp extends NextFTCOpMode {
 
         if (gamepad2.right_bumper)
             Intake.INSTANCE.state ^= true;
+
+        telemetry.addData("Velocity: ",Shooter.INSTANCE.get_vel());
+        telemetry.update();
     }
 }
