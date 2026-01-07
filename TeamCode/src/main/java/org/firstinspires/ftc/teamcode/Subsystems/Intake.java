@@ -8,13 +8,18 @@ import dev.nextftc.hardware.impl.MotorEx;
 public class Intake implements Subsystem {
     public static final Intake INSTANCE = new Intake();
 
-    private Intake() {}
-
-    public boolean state;
+    /* VARIABLES */
+    public boolean state = false;
     private final MotorEx motor = new MotorEx(RobotConfig.MOTOR_INTAKE);
 
+    /* SUBSYSTEM FUNCTIONS */
     @Override
     public void periodic() {
-        motor.setPower((state ? 1 : 0));
+        if (state) {
+            motor.setPower(1.0);
+        }
+        else {
+            motor.setPower(0.0);
+        }
     }
 }

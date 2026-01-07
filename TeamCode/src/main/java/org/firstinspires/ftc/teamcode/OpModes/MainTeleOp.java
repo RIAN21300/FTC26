@@ -7,7 +7,6 @@ import dev.nextftc.core.components.SubsystemComponent;
 import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.extensions.pedro.PedroDriverControlled;
 
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.Shooter;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
@@ -18,7 +17,7 @@ import dev.nextftc.hardware.driving.DriverControlledCommand;
 
 @TeleOp(name = "Main TeleOp")
 public class MainTeleOp extends NextFTCOpMode {
-    public MainTeleOp() {
+    {
         addComponents(
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE,
@@ -27,7 +26,6 @@ public class MainTeleOp extends NextFTCOpMode {
                 new SubsystemComponent(Intake.INSTANCE)
         );
     }
-
     @Override
     public void onStartButtonPressed() {
         DriverControlledCommand driverControlled = new PedroDriverControlled(
@@ -36,13 +34,23 @@ public class MainTeleOp extends NextFTCOpMode {
                 Gamepads.gamepad1().rightStickX()
         );
         driverControlled.schedule();
+    }
 
-        Shooter.INSTANCE.state = gamepad1.left_bumper;
+    @Override
+    public void onUpdate() {
+        // PUSH: Shooter state (ON/OFF) equals to gamepad2 left_bumper state
+        Shooter.INSTANCE.state = gamepad2.left_bumper;
 
+        // TOGGLE: Press gamepad2 right_bumper to change Intake state (ON/OFF)
         if (gamepad2.right_bumper)
             Intake.INSTANCE.state ^= true;
 
-        telemetry.addData("Velocity: ",Shooter.INSTANCE.get_vel());
+        // Shooter debug log
+        telemetry.addData("MotorShooter velocity: ",Shooter.INSTANCE.get_vel());
+        telemetry.addData("Shooter goal: ",Shooter.INSTANCE.get_goal());
+        telemetry.addData("Shooter state: ",Shooter.INSTANCE.state);
+        telemetry.addData("left_bumper state: ",gamepad1.left_bumper);
+        telemetry.addData("MotorShooter power: ", Shooter.INSTANCE.get_power());
         telemetry.update();
     }
 }

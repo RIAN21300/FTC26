@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
-import com.pedropathing.control.Controller;
-
 import org.firstinspires.ftc.teamcode.RobotConfig;
 
 import dev.nextftc.control.ControlSystem;
@@ -12,30 +10,45 @@ import dev.nextftc.hardware.impl.MotorEx;
 public class Shooter implements Subsystem {
     public static final Shooter INSTANCE = new Shooter();
 
-    public boolean state;
-    private ControlSystem controller;
-    private final MotorEx motor;
-    private Shooter() {
-        motor = new MotorEx(RobotConfig.MOTOR_SHOOTER);
+    /* VARIABLES */
+    public boolean state = false;
+    private final MotorEx motor = new MotorEx(RobotConfig.MOTOR_SHOOTER);
+    // PID Controller
+    private final ControlSystem controller = ControlSystem.builder()
+            .velPid(0.04,0,0.001)
+            .build();
 
-        controller = ControlSystem.builder()
-                .velPid(0.1,0,0)
-                .build();
 
+    /* SUBSYSTEM FUNCTIONS */
+    @Override
+    public void initialize() {
         controller.setGoal(new KineticState(0.0,0.0));
     }
 
     @Override
     public void periodic() {
-        if (state) controller.setGoal(new KineticState(0.0,0.9));
-        else controller.setGoal(new KineticState(0.0,0.9));
+        if (state) {
+            // outVelocity = maxVelocity * percentage
+            final double percentage = 0.9;
+            final double maxVelocity = 1800.0;
+            controller.setGoal(new KineticState(0.0, maxVelocity * percentage));
 
-        motor.setPower(controller.calculate(
-                new KineticState(motor.getCurrentPosition(), motor.getVelocity())
-        ));
+            motor.setPower(controller.calculate(new KineticState(motor.getCurrentPosition(), motor.getVelocity())));
+        }
+        else {
+            controller.setGoal(new KineticState(0.0, 0.0));
+            motor.setPower(0.0);
+        }
     }
 
+    /* DEBUG */
     public double get_vel() {
         return motor.getVelocity();
+    }
+    public double get_goal() {
+        return controller.getGoal().getVelocity();
+    }
+    public double get_power() {
+        return motor.getPower();
     }
 }
