@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 import org.firstinspires.ftc.teamcode.RobotConfig;
 
+import dev.nextftc.bindings.Button;
 import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.hardware.impl.ServoEx;
 
@@ -19,24 +20,25 @@ public class Flicker implements Subsystem {
     }
 
     private static class Arm {
+        // Variables
         private final ServoEx servo;
-        public boolean state;
         private final double LIFT_POS = 1.0;
         private final double REST_POS = 0.0;
 
+        // Init
         public Arm(String __NAME__) {
             servo = new ServoEx(__NAME__);
 
             servo.setPosition(REST_POS);
         }
 
-        public void update() {
-            if (state) {
-                servo.setPosition(LIFT_POS);
-            }
-            else {
-                servo.setPosition(REST_POS);
-            }
+        // API
+        public void lift() {
+            servo.setPosition(LIFT_POS);
+        }
+
+        public void rest() {
+            servo.setPosition(REST_POS);
         }
     }
 
@@ -50,16 +52,11 @@ public class Flicker implements Subsystem {
         }
     }
 
-    @Override
-    public void periodic() {
-        for (int i = 0; i < armCount; ++i) {
-            arms[i].update();
-        }
-    }
-
     /* API */
-    public Flicker setArmState(ArmName armName, boolean armState) {
-        arms[armName.ordinal()].state = armState;
+    public Flicker bindArmTo(ArmName armName, Button __button__) {
+        __button__
+                .whenBecomesTrue (() -> arms[armName.ordinal()].lift())
+                .whenBecomesFalse(() -> arms[armName.ordinal()].rest());
         return this;
     }
 }

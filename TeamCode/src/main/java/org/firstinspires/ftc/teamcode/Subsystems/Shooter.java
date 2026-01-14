@@ -14,6 +14,8 @@ public class Shooter implements Subsystem {
     /* VARIABLES */
     public boolean state;
     private final MotorEx motor = new MotorEx(RobotConfig.MOTOR_SHOOTER);
+    public final double percentage = 0.9;
+    public double maxVelocity = 1800.0;
     // PID Controller
     private final ControlSystem controller = ControlSystem.builder()
             .velPid(0.04,0,0.001)
@@ -31,10 +33,7 @@ public class Shooter implements Subsystem {
     public void periodic() {
         if (state) {
             // outVelocity = maxVelocity * percentage
-            final double percentage = 0.9;
-            final double maxVelocity = 1800.0;
             controller.setGoal(new KineticState(0.0, maxVelocity * percentage));
-
             motor.setPower(controller.calculate(new KineticState(motor.getCurrentPosition(), motor.getVelocity())));
         }
         else {
