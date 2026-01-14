@@ -57,8 +57,8 @@ public class Flicker implements Subsystem {
     }
 
     /* API */
-    public Flicker setArmState(ArmName armName, boolean armState) {
-        arms[armName.ordinal()].state = armState;
+    public Flicker setArmState(int armNum, boolean armState) {
+        arms[armNum].state = armState;
         return this;
     }
 }

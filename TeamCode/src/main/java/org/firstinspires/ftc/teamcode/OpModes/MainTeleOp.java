@@ -62,10 +62,6 @@ public class MainTeleOp extends NextFTCOpMode {
 
         // FLICKER
         // PUSH: UpRight = triangle, Left = square, DownRight = cross
-        Flicker.INSTANCE
-                .bindArmTo(Flicker.ArmName.UpRight  , Gamepads.gamepad2().triangle())
-                .bindArmTo(Flicker.ArmName.Left     , Gamepads.gamepad2().square())
-                .bindArmTo(Flicker.ArmName.DownRight, Gamepads.gamepad2().cross());
     }
 
     @Override
@@ -75,6 +71,8 @@ public class MainTeleOp extends NextFTCOpMode {
         // SHOOTER
         // PUSH: Shooter state (ON/OFF) equals to gamepad2 left_bumper state
         Shooter.INSTANCE.setState(gamepad2.left_bumper);
+
+        Flicker.INSTANCE.setArmState(0,gamepad2.dpad_down);
 
         // DEBUG
         telemetry.addLine("====# SHOOTER #====")
