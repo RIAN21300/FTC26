@@ -42,14 +42,13 @@ public class Flicker implements Subsystem {
 
     private static final Arm[] arms = new Arm[armCount];
 
-    /* SUBSYSTEM FUNCTIONS */
-    @Override
-    public void initialize() {
+    public Flicker() {
         for (int i = 0; i < armCount; ++i) {
             arms[i] = new Arm(RobotConfig.SERVO_FLICKER[i]);
         }
     }
 
+    /* SUBSYSTEM FUNCTIONS */
     @Override
     public void periodic() {
         for (int i = 0; i < armCount; ++i) {
