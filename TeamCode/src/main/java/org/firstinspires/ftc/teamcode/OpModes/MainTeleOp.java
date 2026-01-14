@@ -28,7 +28,7 @@ public class MainTeleOp extends NextFTCOpMode {
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE,
                 new PedroComponent(Constants::createFollower),
-                new SubsystemComponent(Shooter.INSTANCE, Intake.INSTANCE, Flicker.INSTANCE)
+                new SubsystemComponent(Shooter.INSTANCE, Intake.INSTANCE)
         );
     }
 
@@ -72,8 +72,6 @@ public class MainTeleOp extends NextFTCOpMode {
         // PUSH: Shooter state (ON/OFF) equals to gamepad2 left_bumper state
         Shooter.INSTANCE.setState(gamepad2.left_bumper);
 
-        Flicker.INSTANCE.setArmState(0,gamepad2.triangle);
-
         // DEBUG
         telemetry.addLine("====# SHOOTER #====")
 
@@ -90,10 +88,5 @@ public class MainTeleOp extends NextFTCOpMode {
                 .addData("MotorIntake power: "    , Intake.INSTANCE.get_power());
 
         telemetry.update();
-    }
-
-    @Override
-    public void onStop() {
-        BindingManager.reset();
     }
 }
