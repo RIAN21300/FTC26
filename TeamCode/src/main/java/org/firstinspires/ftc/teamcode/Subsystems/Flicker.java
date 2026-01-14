@@ -8,57 +8,29 @@ import dev.nextftc.hardware.impl.ServoEx;
 public class Flicker implements Subsystem {
     public static final Flicker INSTANCE = new Flicker();
 
-    /* VARIABLES */
+    private ServoEx[] servo;
+    public boolean state[];
+    private static final double upPos = 1.0;
+    private static final double downPos = 0;
     private static final int armCount = 3;
-    // ARM
-    public enum ArmName {
-        UpRight,
-        Left,
-        DownRight
-
-    }
-
-    private static class Arm {
-        private final ServoEx servo;
-        public boolean state;
-        private final double LIFT_POS = 1.0;
-        private final double REST_POS = 0.0;
-
-        public Arm(String __NAME__) {
-            servo = new ServoEx(__NAME__);
-
-            servo.setPosition(REST_POS);
-        }
-
-        public void update() {
-            if (state) {
-                servo.setPosition(LIFT_POS);
-            }
-            else {
-                servo.setPosition(REST_POS);
-            }
-        }
-    }
-
-    private static final Arm[] arms = new Arm[armCount];
 
     public Flicker() {
-        for (int i = 0; i < armCount; ++i) {
-            arms[i] = new Arm(RobotConfig.SERVO_FLICKER[i]);
+        for (int i = 0; i < armCount; i++) {
+            servo[i] = new ServoEx(RobotConfig.SERVO_FLICKER[i]);
         }
     }
 
     /* SUBSYSTEM FUNCTIONS */
     @Override
     public void periodic() {
-        for (int i = 0; i < armCount; ++i) {
-            arms[i].update();
+        for (int i = 0; i < armCount; i++) {
+            if (state[i]) servo[i].setPosition(upPos);
+            else servo[i].setPosition(downPos);
         }
     }
 
     /* API */
-    public Flicker setArmState(int armNum, boolean armState) {
-        arms[armNum].state = armState;
-        return this;
+    public void setArmState(int armNum, boolean armState) {
+        state[armNum] = armState;
     }
 }
