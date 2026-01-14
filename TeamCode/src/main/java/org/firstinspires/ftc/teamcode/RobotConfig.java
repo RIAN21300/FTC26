@@ -7,4 +7,7 @@ public class RobotConfig {
 
     // SERVO
     public static String[] SERVO_FLICKER = {"ServoArm_UpRight", "ServoArm_Left", "ServoArm_DownRight"};
+
+    // WEBCAM
+    public static final String COLOR_WEBCAM = "ColorWebcam";
 }
