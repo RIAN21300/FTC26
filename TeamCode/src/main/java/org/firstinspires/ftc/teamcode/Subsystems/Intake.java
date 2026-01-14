@@ -22,4 +22,9 @@ public class Intake implements Subsystem {
     public void rest() {
         motor.setPower(REST_POWER);
     }
+
+    /* DEBUG */
+    public double get_power() {
+        return motor.getPower();
+    }
 }
