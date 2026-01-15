@@ -21,7 +21,6 @@ public class Shooter implements Subsystem {
             .velPid(0.04,0,0.001)
             .build();
 
-
     /* SUBSYSTEM FUNCTIONS */
     @Override
     public void initialize() {
