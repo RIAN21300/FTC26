@@ -9,7 +9,7 @@ public class Flicker implements Subsystem {
     public static final Flicker INSTANCE = new Flicker();
 
     private ServoEx[] servo;
-    public boolean state[];
+    public boolean[] state;
     private static final double upPos = 1.0;
     private static final double downPos = 0;
     private static final int armCount = 3;

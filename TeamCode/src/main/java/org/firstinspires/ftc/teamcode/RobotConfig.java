@@ -6,7 +6,7 @@ public class RobotConfig {
     public static final String MOTOR_INTAKE = "MotorIntake";
 
     // SERVO
-    public static String[] SERVO_FLICKER = {"ServoArm_UpRight", "ServoArm_Left", "ServoArm_DownRight"};
+    public static final String[] SERVO_FLICKER = {"ServoArm_UpRight", "ServoArm_Left", "ServoArm_DownRight"};
 
     // WEBCAM
     public static final String COLOR_WEBCAM = "ColorWebcam";
