@@ -12,6 +12,8 @@ package org.firstinspires.ftc.teamcode;
  > ^ <  > ^ <  > ^ <  > ^ <
 */
 
+import com.qualcomm.robotcore.hardware.PwmControl;
+
 public class RobotConfig {
     // MOTOR
     public static final String MOTOR_SHOOTER = "MotorShooter";

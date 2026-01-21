@@ -36,7 +36,7 @@ public class Flicker implements Subsystem {
 
         // Variables
         private static final double LIFT_POS = 0.5;
-        private static final double REST_POS = 0.0;
+        private static final double REST_POS = -0.5;
         private final ServoEx servo;
 
         // API
@@ -60,9 +60,6 @@ public class Flicker implements Subsystem {
     public void initialize() {
         for (int i = 0; i < armCount; ++i) {
             arms[i] = new Arm(RobotConfig.SERVO_FLICKER[i]);
-        }
-
-        for (int i = 0; i < armCount; ++i) {
             arms[i].setRestPos();
         }
     }
