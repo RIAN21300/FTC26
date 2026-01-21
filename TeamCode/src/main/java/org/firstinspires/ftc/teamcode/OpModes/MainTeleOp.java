@@ -29,7 +29,10 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import dev.nextftc.ftc.Gamepads;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
+import dev.nextftc.hardware.driving.FieldCentric;
 import dev.nextftc.hardware.driving.MecanumDriverControlled;
+import dev.nextftc.hardware.impl.Direction;
+import dev.nextftc.hardware.impl.IMUEx;
 import dev.nextftc.hardware.impl.MotorEx;
 
 @TeleOp(name = "Main TeleOp")
@@ -45,10 +48,11 @@ public class MainTeleOp extends NextFTCOpMode {
     }
 
     /* VARIABLES */
-    private final MotorEx frontLeftMotor = new MotorEx("left_front");
-    private final MotorEx frontRightMotor = new MotorEx("right_front").reversed();
-    private final MotorEx backLeftMotor = new MotorEx("left_back");
-    private final MotorEx backRightMotor = new MotorEx("right_back");
+    private final MotorEx frontLeftMotor = new MotorEx("left_front").brakeMode();
+    private final MotorEx frontRightMotor = new MotorEx("right_front").reversed().brakeMode();
+    private final MotorEx backLeftMotor = new MotorEx("left_back").brakeMode();
+    private final MotorEx backRightMotor = new MotorEx("right_back").brakeMode();
+    private IMUEx imu = new IMUEx("imu", Direction.UP, Direction.FORWARD).zeroed();
 
     /* TELEOP FUNCTIONS */
     @Override
@@ -61,7 +65,8 @@ public class MainTeleOp extends NextFTCOpMode {
                 backRightMotor,
                 Gamepads.gamepad1().leftStickY().negate(),
                 Gamepads.gamepad1().leftStickX(),
-                Gamepads.gamepad1().rightStickX()
+                Gamepads.gamepad1().rightStickX(),
+                new FieldCentric(imu)
         );
         driverControlled.schedule();
 
