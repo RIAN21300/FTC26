@@ -38,14 +38,20 @@ public class Flicker implements Subsystem {
         private static final double LIFT_POS = 0.5;
         private static final double REST_POS = -0.5;
         private final ServoEx servo;
+        private boolean lift;
 
         // API
         public void setLiftPos() {
-            servo.setPosition(LIFT_POS);
+            lift = true;
         }
 
         public void setRestPos() {
-            servo.setPosition(REST_POS);
+            lift = false;
+        }
+
+        public void update() {
+            if (lift) servo.setPosition(LIFT_POS);
+            else servo.setPosition(REST_POS);
         }
 
         public double getPos() {
@@ -71,6 +77,13 @@ public class Flicker implements Subsystem {
 
     public void rest(ArmName armName) {
         arms[armName.ordinal()].setRestPos();
+    }
+
+    @Override
+    public void periodic() {
+        for (int i = 0; i < armCount; ++i) {
+            arms[i].update();
+        }
     }
 
     public double get_pos(ArmName armName) {
