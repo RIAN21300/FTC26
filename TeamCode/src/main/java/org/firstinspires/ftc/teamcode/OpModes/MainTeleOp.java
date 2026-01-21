@@ -1,5 +1,17 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
+/*
+ /\_/\  /\_/\  /\_/\  /\_/\
+( o.o )( o.o )( o.o )( o.o )
+ > ^ <  > ^ <  > ^ <  > ^ <
+ /\_/\                /\_/\
+( o.o )   ghelopax   ( o.o )
+ > ^ <                > ^ <
+ /\_/\  /\_/\  /\_/\  /\_/\
+( o.o )( o.o )( o.o )( o.o )
+ > ^ <  > ^ <  > ^ <  > ^ <
+*/
+
 import static dev.nextftc.bindings.Bindings.*;
 
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -12,7 +24,7 @@ import dev.nextftc.extensions.pedro.PedroComponent;
 
 import org.firstinspires.ftc.teamcode.Subsystems.Flicker;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
-import org.firstinspires.ftc.teamcode.Subsystems.Shooter;
+import org.firstinspires.ftc.teamcode.Subsystems.HoodedShooter;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import dev.nextftc.ftc.Gamepads;
 import dev.nextftc.ftc.NextFTCOpMode;
@@ -28,7 +40,7 @@ public class MainTeleOp extends NextFTCOpMode {
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE,
                 new PedroComponent(Constants::createFollower),
-                new SubsystemComponent(Shooter.INSTANCE, Intake.INSTANCE, Flicker.INSTANCE)
+                new SubsystemComponent(HoodedShooter.INSTANCE, Intake.INSTANCE, Flicker.INSTANCE)
         );
     }
 
@@ -81,25 +93,33 @@ public class MainTeleOp extends NextFTCOpMode {
 
         // SHOOTER
         // PUSH: Shooter state (ON/OFF) equals to gamepad2 left_bumper state
-        Shooter.INSTANCE.setState(gamepad2.left_bumper);
+        HoodedShooter.INSTANCE.setState(gamepad2.left_bumper);
 
         // DEBUG
-        telemetry.addLine("====# SHOOTER #====")
+        telemetry.addLine("\n====# GAMEPAD1 JOYSTICK #====")
+                .addData("\ngamepad1.left_stick_y [negated]: ", -gamepad1.left_stick_y)
+                .addData("\ngamepad1.left_stick_x: "          , gamepad1.left_stick_x)
+                .addData("\ngamepad1.right_stick_x: "         , gamepad1.right_stick_x);
+
+        telemetry.addLine("====# HOODED SHOOTER #====")
                 .addData("\ngamepad2.left_bumper: " , gamepad2.left_bumper)
-                .addData("\nMotorShooter power: "   , Shooter.INSTANCE.get_power())
-                .addData("\nMotorShooter velocity: ", Shooter.INSTANCE.get_vel())
+//                .addData("\nMotorShooter power: "   , Shooter.INSTANCE.get_power())
+//                .addData("\nMotorShooter velocity: ", Shooter.INSTANCE.get_vel())
 //                .addData("Shooter goal: "         , Shooter.INSTANCE.get_goal())
 //                .addData("Shooter state: "        , Shooter.INSTANCE.state)
-                .addData("\npercentage reached: "   , Shooter.INSTANCE.get_vel() / Shooter.INSTANCE.maxVelocity);
+                .addData("\npercentage reached: "   , HoodedShooter.INSTANCE.shooter.getCurrentPercentage());
 
         telemetry.addLine("\n====# INTAKE #====")
                 .addData("\ngamepad2.right_bumper: ", gamepad2.right_bumper)
                 .addData("\nMotorIntake power: "    , Intake.INSTANCE.get_power());
 
-        telemetry.addLine("\n====# GAMEPAD1 JOYSTICK #====")
-                .addData("\ngamepad1.left_stick_y [negated]: ", -gamepad1.left_stick_y)
-                .addData("\ngamepad1.left_stick_x: "          , gamepad1.left_stick_x)
-                .addData("\ngamepad1.right_stick_x: "         , gamepad1.right_stick_x);
+        telemetry.addLine("\n====# FLICKER #====")
+                .addData("\ngamepad2.triangle: ", gamepad2.triangle)
+                .addData("\nServoArmUpRight position: ", Flicker.INSTANCE.get_pos(Flicker.ArmName.UpRight))
+                .addData("\ngamepad2.square: ", gamepad2.square)
+                .addData("\nServoArmLeft position: ", Flicker.INSTANCE.get_pos(Flicker.ArmName.Left))
+                .addData("\ngamepad2.cross: ", gamepad2.cross)
+                .addData("\nServoArmDownRight position: ", Flicker.INSTANCE.get_pos(Flicker.ArmName.DownRight));
 
         telemetry.update();
     }
@@ -107,5 +127,13 @@ public class MainTeleOp extends NextFTCOpMode {
     @Override
     public void onStop() {
         BindingManager.reset();
+
+        HoodedShooter.INSTANCE.setState(false);
+
+        Intake.INSTANCE.rest();
+
+        Flicker.INSTANCE.rest(Flicker.ArmName.UpRight);
+        Flicker.INSTANCE.rest(Flicker.ArmName.Left);
+        Flicker.INSTANCE.rest(Flicker.ArmName.DownRight);
     }
 }

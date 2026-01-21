@@ -1,5 +1,17 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+/*
+ /\_/\  /\_/\  /\_/\  /\_/\
+( o.o )( o.o )( o.o )( o.o )
+ > ^ <  > ^ <  > ^ <  > ^ <
+ /\_/\                /\_/\
+( o.o )   ghelopax   ( o.o )
+ > ^ <                > ^ <
+ /\_/\  /\_/\  /\_/\  /\_/\
+( o.o )( o.o )( o.o )( o.o )
+ > ^ <  > ^ <  > ^ <  > ^ <
+*/
+
 import org.firstinspires.ftc.teamcode.RobotConfig;
 
 import dev.nextftc.core.subsystems.Subsystem;
@@ -14,10 +26,17 @@ public class Intake implements Subsystem {
     private final double INTAKE_POWER = 1.0;
     private final double REST_POWER = 0.0;
 
+    /* SUBSYSTEM FUNCTIONS */
+    @Override
+    public void initialize() {
+        rest();
+    }
+
     /* API */
     public void run() {
         motor.setPower(INTAKE_POWER);
     }
+
 
     public void rest() {
         motor.setPower(REST_POWER);

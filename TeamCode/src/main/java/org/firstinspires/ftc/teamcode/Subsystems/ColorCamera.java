@@ -19,7 +19,7 @@ import dev.nextftc.core.subsystems.Subsystem;
 
 public class ColorCamera implements Subsystem {
 
-    private final Point ballPosition[] = {new Point(0,0),       //Average estimate position
+    private final Point[] ballPosition = {new Point(0,0),       //Average estimate position
                                           new Point(0,0),
                                           new Point(0,0)};      //TODO: tune this later to align with ball position in floor
 
