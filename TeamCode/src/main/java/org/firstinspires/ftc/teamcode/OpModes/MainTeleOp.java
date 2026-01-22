@@ -52,9 +52,14 @@ public class MainTeleOp extends NextFTCOpMode {
     private final MotorEx frontRightMotor = new MotorEx("right_front").reversed().brakeMode();
     private final MotorEx backLeftMotor = new MotorEx("left_back").brakeMode();
     private final MotorEx backRightMotor = new MotorEx("right_back").brakeMode();
-    private IMUEx imu = new IMUEx("imu", Direction.UP, Direction.FORWARD).zeroed();
+    private final IMUEx imu = new IMUEx("imu", Direction.UP, Direction.FORWARD).zeroed();
 
     /* TELEOP FUNCTIONS */
+    @Override
+    public void onWaitForStart() {
+//        HoodedShooter.INSTANCE.turret.updateDesiredTagID(gamepad1.circle, gamepad2.cross);
+    }
+
     @Override
     public void onStartButtonPressed() {
         // DRIVETRAIN

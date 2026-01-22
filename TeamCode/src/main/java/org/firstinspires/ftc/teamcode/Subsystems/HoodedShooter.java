@@ -12,7 +12,15 @@ package org.firstinspires.ftc.teamcode.Subsystems;
  > ^ <  > ^ <  > ^ <  > ^ <
 */
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.RobotConfig;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+
+import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import java.util.List;
 
 import dev.nextftc.control.ControlSystem;
 import dev.nextftc.control.KineticState;
@@ -67,26 +75,53 @@ public class HoodedShooter implements Subsystem {
     public static class Turret {
         // Init
         public Turret() {
+            // init AprilTag
+            aprilTag = new AprilTagProcessor.Builder()
+                    .build();
+            aprilTag.setDecimation(3);
 
+            visionPortal = new VisionPortal.Builder()
+                    .setCamera(hardwareMap.get(WebcamName.class, RobotConfig.WEBCAM))
+                    .addProcessor(aprilTag)
+                    .build();
         }
 
         // Variables
+        private HardwareMap hardwareMap;
+        private final VisionPortal visionPortal;
+        private final AprilTagProcessor aprilTag;
+        private int DESIRED_TAG_ID = 20;
 
+        // API
+        public void updateDesiredTagID(boolean RED, boolean BLUE) {
+            if (RED) DESIRED_TAG_ID = 24;
+            if (BLUE) DESIRED_TAG_ID = 20;
+        }
 
+        public void update() {
+            List<AprilTagDetection> detectionList = aprilTag.getDetections();
+
+            for (AprilTagDetection detection : detectionList) {
+                if (detection.id == DESIRED_TAG_ID) {
+
+                }
+            }
+        }
     }
 
     public Shooter shooter = new Shooter();
-    public Turret turret = new Turret();
+//    public Turret turret = new Turret();
 
     /* SUBSYSTEM FUNCTIONS */
     @Override
     public void initialize() {
-        shooter.setState(false);
+
     }
 
     @Override
     public void periodic() {
         shooter.update();
+//        turret.update();
     }
 
     /* API */

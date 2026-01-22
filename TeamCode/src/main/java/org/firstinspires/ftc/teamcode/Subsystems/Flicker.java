@@ -28,6 +28,8 @@ public class Flicker implements Subsystem {
     }
 
     private static final int armCount = 3;
+
+    // Arm class, using 180-degree servo
     public static class Arm {
         // Init
         public Arm(String servoName) {
@@ -35,23 +37,17 @@ public class Flicker implements Subsystem {
         }
 
         // Variables
-        private static final double LIFT_POS = 0.5;
-        private static final double REST_POS = -0.5;
+        private static final double LIFT_POS = 1.8/9.0;
+        private static final double REST_POS = 7.2/9.0;
         private final ServoEx servo;
-        private boolean lift;
 
         // API
         public void setLiftPos() {
-            lift = true;
+            servo.setPosition(LIFT_POS);
         }
 
         public void setRestPos() {
-            lift = false;
-        }
-
-        public void update() {
-            if (lift) servo.setPosition(LIFT_POS);
-            else servo.setPosition(REST_POS);
+            servo.setPosition(REST_POS);
         }
 
         public double getPos() {
@@ -77,13 +73,6 @@ public class Flicker implements Subsystem {
 
     public void rest(ArmName armName) {
         arms[armName.ordinal()].setRestPos();
-    }
-
-    @Override
-    public void periodic() {
-        for (int i = 0; i < armCount; ++i) {
-            arms[i].update();
-        }
     }
 
     public double get_pos(ArmName armName) {

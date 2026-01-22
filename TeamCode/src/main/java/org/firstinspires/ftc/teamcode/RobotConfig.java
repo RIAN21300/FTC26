@@ -12,8 +12,6 @@ package org.firstinspires.ftc.teamcode;
  > ^ <  > ^ <  > ^ <  > ^ <
 */
 
-import com.qualcomm.robotcore.hardware.PwmControl;
-
 public class RobotConfig {
     // MOTOR
     public static final String MOTOR_SHOOTER = "MotorShooter";
@@ -23,5 +21,6 @@ public class RobotConfig {
     public static final String[] SERVO_FLICKER = {"ServoArmUpRight", "ServoArmLeft", "ServoArmDownRight"};
 
     // WEBCAM
+    public static final String WEBCAM = "Webcam";
     public static final String COLOR_WEBCAM = "ColorWebcam";
 }
