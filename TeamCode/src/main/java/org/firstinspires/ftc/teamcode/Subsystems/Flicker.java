@@ -12,6 +12,7 @@ package org.firstinspires.ftc.teamcode.Subsystems;
  > ^ <  > ^ <  > ^ <  > ^ <
 */
 
+
 import org.firstinspires.ftc.teamcode.RobotConfig;
 
 import dev.nextftc.core.subsystems.Subsystem;
@@ -37,21 +38,27 @@ public class Flicker implements Subsystem {
         }
 
         // Variables
-        private static final double LIFT_POS = 1.8/9.0;
-        private static final double REST_POS = 7.2/9.0;
+        private static final double LIFT_POS = 2/9.0;
+        private static final double REST_POS = 7/9.0;
         private final ServoEx servo;
+        private boolean state;
 
         // API
         public void setLiftPos() {
-            servo.setPosition(LIFT_POS);
+            state = true;
         }
 
         public void setRestPos() {
-            servo.setPosition(REST_POS);
+            state = false;
         }
 
         public double getPos() {
             return servo.getPosition();
+        }
+
+        public void update() {
+            if (state) servo.setPosition(LIFT_POS);
+            else servo.setPosition(REST_POS);
         }
     }
 
@@ -73,6 +80,13 @@ public class Flicker implements Subsystem {
 
     public void rest(ArmName armName) {
         arms[armName.ordinal()].setRestPos();
+    }
+
+    @Override
+    public void periodic() {
+        for (int i = 0; i < armCount; ++i) {
+            arms[i].update();
+        }
     }
 
     public double get_pos(ArmName armName) {
