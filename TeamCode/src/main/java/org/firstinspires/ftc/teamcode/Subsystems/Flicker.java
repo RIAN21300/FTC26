@@ -38,22 +38,18 @@ public class Flicker implements Subsystem {
         }
 
         // Variables
-        private static final double LIFT_POS = 2/9.0;
-        private static final double REST_POS = 7/9.0;
+        private static final double LIFT_POS = 8.0/9.0;
+        private static final double REST_POS = 1.0/9.0;
         private final ServoEx servo;
         private boolean state;
 
         // API
-        public void setLiftPos() {
-            state = true;
-        }
-
-        public void setRestPos() {
-            state = false;
-        }
-
         public double getPos() {
             return servo.getPosition();
+        }
+
+        public void setState(boolean newState) {
+            state = newState;
         }
 
         public void update() {
@@ -69,17 +65,8 @@ public class Flicker implements Subsystem {
     public void initialize() {
         for (int i = 0; i < armCount; ++i) {
             arms[i] = new Arm(RobotConfig.SERVO_FLICKER[i]);
-            arms[i].setRestPos();
+            arms[i].setState(false);
         }
-    }
-
-    /* API */
-    public void lift(ArmName armName) {
-        arms[armName.ordinal()].setLiftPos();
-    }
-
-    public void rest(ArmName armName) {
-        arms[armName.ordinal()].setRestPos();
     }
 
     @Override
@@ -87,6 +74,15 @@ public class Flicker implements Subsystem {
         for (int i = 0; i < armCount; ++i) {
             arms[i].update();
         }
+    }
+
+    /* API */
+    public void setArmState(ArmName armName, boolean newArmState) {
+        arms[armName.ordinal()].setState(newArmState);
+    }
+
+    public boolean getArmState(ArmName armName) {
+        return arms[armName.ordinal()].state;
     }
 
     public double get_pos(ArmName armName) {
