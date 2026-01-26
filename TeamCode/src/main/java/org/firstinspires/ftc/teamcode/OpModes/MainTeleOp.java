@@ -58,6 +58,9 @@ public class MainTeleOp extends NextFTCOpMode {
     @Override
     public void onWaitForStart() {
 //        HoodedShooter.INSTANCE.turret.updateDesiredTagID(gamepad1.circle, gamepad2.cross);
+
+        telemetry.addLine("Connect Instruction: adb connect 192.168.43.1\nStatus: adb devices\nDisconnect: adb disconnect");
+        telemetry.update();
     }
 
     @Override
