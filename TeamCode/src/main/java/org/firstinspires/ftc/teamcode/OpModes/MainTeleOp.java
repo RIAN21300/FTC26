@@ -29,7 +29,6 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import dev.nextftc.ftc.Gamepads;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
-import dev.nextftc.hardware.driving.FieldCentric;
 import dev.nextftc.hardware.driving.MecanumDriverControlled;
 import dev.nextftc.hardware.impl.Direction;
 import dev.nextftc.hardware.impl.IMUEx;
@@ -52,12 +51,12 @@ public class MainTeleOp extends NextFTCOpMode {
     private final MotorEx frontRightMotor = new MotorEx("right_front").reversed().brakeMode();
     private final MotorEx backLeftMotor = new MotorEx("left_back").brakeMode();
     private final MotorEx backRightMotor = new MotorEx("right_back").brakeMode();
-//    private final IMUEx imu = new IMUEx("imu", Direction.UP, Direction.FORWARD).zeroed();
+    private final IMUEx imu = new IMUEx("imu", Direction.UP, Direction.FORWARD).zeroed();
 
-    /* TELEOP FUNCTIONS */
+    /* OPMODE FUNCTIONS */
     @Override
     public void onWaitForStart() {
-//        HoodedShooter.INSTANCE.turret.updateDesiredTagID(gamepad1.circle, gamepad2.cross);
+        HoodedShooter.INSTANCE.turret.updateDesiredTagID(gamepad1.circle, gamepad2.cross);
 
         telemetry.addLine("Connect Instruction: adb connect 192.168.43.1\nStatus: adb devices\nDisconnect: adb disconnect");
         telemetry.update();
@@ -106,7 +105,7 @@ public class MainTeleOp extends NextFTCOpMode {
                 .addData("\ngamepad1.left_stick_x: "          , gamepad1.left_stick_x)
                 .addData("\ngamepad1.right_stick_x: "         , gamepad1.right_stick_x);
 
-        telemetry.addLine("====# HOODED SHOOTER #====")
+        telemetry.addLine("\n====# HOODED SHOOTER #====")
                 .addData("\ngamepad2.left_bumper: " , gamepad2.left_bumper)
 //                .addData("\nMotorShooter power: "   , Shooter.INSTANCE.get_power())
 //                .addData("\nMotorShooter velocity: ", Shooter.INSTANCE.get_vel())
@@ -119,13 +118,13 @@ public class MainTeleOp extends NextFTCOpMode {
                 .addData("\nMotorIntake power: "    , Intake.INSTANCE.get_power());
 
         telemetry.addLine("\n====# FLICKER #====")
-                .addData("\ngamepad2.triangle: ", gamepad2.triangle)
-                .addData("\nServoArmUpRight position: ", Flicker.INSTANCE.get_pos(Flicker.ArmName.UpRight))
-                .addData("\ngamepad2.square: ", gamepad2.square)
-                .addData("\nServoArmLeft position: ", Flicker.INSTANCE.get_pos(Flicker.ArmName.Left))
-                .addData("\ngamepad2.cross: ", gamepad2.cross)
-                .addData("\nArm_DownRight state: ", Flicker.INSTANCE.getArmState(Flicker.ArmName.DownRight))
-                .addData("\nServoArmDownRight position: ", Flicker.INSTANCE.get_pos(Flicker.ArmName.DownRight));
+                .addData("\ngamepad2.triangle: "         , gamepad2.triangle)
+                .addData("\nServoArmUpRight position: "  , Flicker.INSTANCE.getArmPos(Flicker.ArmName.UpRight))
+                .addData("\ngamepad2.square: "           , gamepad2.square)
+                .addData("\nServoArmLeft position: "     , Flicker.INSTANCE.getArmPos(Flicker.ArmName.Left))
+                .addData("\ngamepad2.cross: "            , gamepad2.cross)
+                .addData("\nArm_DownRight state: "       , Flicker.INSTANCE.getArmState(Flicker.ArmName.DownRight))
+                .addData("\nServoArmDownRight position: ", Flicker.INSTANCE.getArmPos(Flicker.ArmName.DownRight));
 
         telemetry.update();
     }

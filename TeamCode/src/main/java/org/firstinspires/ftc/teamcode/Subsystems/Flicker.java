@@ -85,7 +85,7 @@ public class Flicker implements Subsystem {
         return arms[armName.ordinal()].state;
     }
 
-    public double get_pos(ArmName armName) {
+    public double getArmPos(ArmName armName) {
         return arms[armName.ordinal()].getPos();
     }
 }
