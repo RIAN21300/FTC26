@@ -137,7 +137,7 @@ public class ConceptVisionColorLocator_Rectangle extends LinearOpMode {
          */
         VisionPortal portal = new VisionPortal.Builder()
                 .addProcessor(colorLocator)
-                .setCameraResolution(new Size(320, 240))
+                .setCameraResolution(new Size(640, 480))
                 .setCamera(hardwareMap.get(WebcamName.class, RobotConfig.COLOR_WEBCAM))
                 .build();
 
