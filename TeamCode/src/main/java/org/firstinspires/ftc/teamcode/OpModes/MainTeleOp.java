@@ -91,7 +91,11 @@ public class MainTeleOp extends NextFTCOpMode {
 
         // SHOOTER
         // PUSH: Shooter state (ON/OFF) equals to gamepad2 left_bumper state
-        HoodedShooter.INSTANCE.setState(gamepad2.left_bumper);
+        HoodedShooter.INSTANCE.setShooterState(gamepad2.left_bumper);
+
+        // TURRET
+        // ANALOG: gamepad2 left stick x
+        HoodedShooter.INSTANCE.setTurretRotateSpeed(-gamepad2.left_stick_x);
 
         // FLICKER
         // PUSH: UpRight = triangle, Left = square, DownRight = cross
@@ -105,13 +109,18 @@ public class MainTeleOp extends NextFTCOpMode {
                 .addData("\ngamepad1.left_stick_x: "          , gamepad1.left_stick_x)
                 .addData("\ngamepad1.right_stick_x: "         , gamepad1.right_stick_x);
 
-        telemetry.addLine("\n====# HOODED SHOOTER #====")
+        telemetry.addLine("\n====# SHOOTER #====")
                 .addData("\ngamepad2.left_bumper: " , gamepad2.left_bumper)
 //                .addData("\nMotorShooter power: "   , Shooter.INSTANCE.get_power())
 //                .addData("\nMotorShooter velocity: ", Shooter.INSTANCE.get_vel())
 //                .addData("Shooter goal: "         , Shooter.INSTANCE.get_goal())
 //                .addData("Shooter state: "        , Shooter.INSTANCE.state)
                 .addData("\npercentage reached: "   , HoodedShooter.INSTANCE.shooter.getCurrentPercentage());
+
+        telemetry.addLine("\n====# Turret #====")
+                .addData("\ngamepad2.left_stick_x: ", gamepad2.left_stick_x)
+                .addData("\nTurret rotateSpeed: ", HoodedShooter.INSTANCE.turret.rotateSpeed)
+                .addData("\nServoTurretRotate speed: ", HoodedShooter.INSTANCE.turret.getRotateSpeed());
 
         telemetry.addLine("\n====# INTAKE #====")
                 .addData("\ngamepad2.right_bumper: ", gamepad2.right_bumper)
@@ -133,7 +142,7 @@ public class MainTeleOp extends NextFTCOpMode {
     public void onStop() {
         BindingManager.reset();
 
-        HoodedShooter.INSTANCE.setState(false);
+        HoodedShooter.INSTANCE.setShooterState(false);
 
         Intake.INSTANCE.rest();
 

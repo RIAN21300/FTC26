@@ -5,7 +5,10 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.RobotConfig;
 import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+
+import java.util.List;
 
 import dev.nextftc.core.subsystems.Subsystem;
 
@@ -13,9 +16,9 @@ public class Camera implements Subsystem {
     public static final Camera INSTANCE = new Camera();
 
     /* VARIABLES */
-    HardwareMap hardwareMap;
-    AprilTagProcessor aprilTag;
-    VisionPortal visionPortal;
+    private HardwareMap hardwareMap;
+    private AprilTagProcessor aprilTag;
+    private VisionPortal visionPortal;
 
     /* SUBSYSTEM FUNCTIONS */
     @Override
@@ -36,5 +39,7 @@ public class Camera implements Subsystem {
     }
 
     /* API */
-
+    public List<AprilTagDetection> getDetectionList() {
+        return aprilTag.getDetections();
+    }
 }

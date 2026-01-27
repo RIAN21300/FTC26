@@ -19,6 +19,7 @@ public class RobotConfig {
 
     // SERVO
     public static final String[] SERVO_FLICKER = {"ServoArmUpRight", "ServoArmLeft", "ServoArmDownRight"};
+    public static final String SERVO_TURRET_ROTATE = "ServoTurretRotate"; // CR Servo (Servo 360)
 
     // WEBCAM
     public static final String WEBCAM = "Webcam";

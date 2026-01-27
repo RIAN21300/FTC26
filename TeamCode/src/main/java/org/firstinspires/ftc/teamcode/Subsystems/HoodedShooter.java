@@ -17,6 +17,7 @@ import org.firstinspires.ftc.teamcode.RobotConfig;
 import dev.nextftc.control.ControlSystem;
 import dev.nextftc.control.KineticState;
 import dev.nextftc.core.subsystems.Subsystem;
+import dev.nextftc.hardware.impl.CRServoEx;
 import dev.nextftc.hardware.impl.MotorEx;
 
 /* Hooded Shooter */
@@ -67,20 +68,31 @@ public class HoodedShooter implements Subsystem {
     public static class Turret {
         // Init
         public Turret() {
-
+            DESIRED_TAG_ID = 20;
+            rotateSpeed = 0.0;
         }
 
         // Variables
-        private int DESIRED_TAG_ID = 20;
+        private int DESIRED_TAG_ID;
+        private final CRServoEx rotate = new CRServoEx(RobotConfig.SERVO_TURRET_ROTATE); // Rotating servo
+        public double rotateSpeed;
 
         // API
+        public void setRotateSpeed(double newSpeed) {
+            rotateSpeed = newSpeed;
+        }
+
+        public double getRotateSpeed() {
+            return rotate.getPower();
+        }
+
         public void updateDesiredTagID(boolean RED, boolean BLUE) {
             if (RED) DESIRED_TAG_ID = 24;
             if (BLUE) DESIRED_TAG_ID = 20;
         }
 
         public void update() {
-
+            rotate.setPower(rotateSpeed);
         }
     }
 
@@ -100,7 +112,11 @@ public class HoodedShooter implements Subsystem {
     }
 
     /* API */
-    public void setState(boolean newState) {
+    public void setShooterState(boolean newState) {
         shooter.setState(newState);
+    }
+
+    public void setTurretRotateSpeed(double speed) {
+        turret.setRotateSpeed(speed);
     }
 }
