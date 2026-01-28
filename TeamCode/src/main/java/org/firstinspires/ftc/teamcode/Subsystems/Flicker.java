@@ -22,12 +22,6 @@ public class Flicker implements Subsystem {
     public static final Flicker INSTANCE = new Flicker();
 
     /* VARIABLES */
-    public enum ArmName {
-        UpRight,
-        Left,
-        DownRight
-    }
-
     private static final int armCount = 3;
 
     // Arm class, using 180-degree servo
@@ -77,15 +71,15 @@ public class Flicker implements Subsystem {
     }
 
     /* API */
-    public void setArmState(ArmName armName, boolean newArmState) {
+    public void setArmState(RobotConfig.BallSlotName armName, boolean newArmState) {
         arms[armName.ordinal()].setState(newArmState);
     }
 
-    public boolean getArmState(ArmName armName) {
+    public boolean getArmState(RobotConfig.BallSlotName armName) {
         return arms[armName.ordinal()].state;
     }
 
-    public double getArmPos(ArmName armName) {
+    public double getArmPos(RobotConfig.BallSlotName armName) {
         return arms[armName.ordinal()].getPos();
     }
 }

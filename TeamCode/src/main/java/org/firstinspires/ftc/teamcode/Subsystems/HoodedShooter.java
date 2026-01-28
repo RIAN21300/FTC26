@@ -91,6 +91,15 @@ public class HoodedShooter implements Subsystem {
             if (BLUE) DESIRED_TAG_ID = 20;
         }
 
+        public String getCurrentAlliance() {
+            if (DESIRED_TAG_ID == 24)
+                return "RED";
+            if (DESIRED_TAG_ID == 20)
+                return "BLUE";
+
+            return "NOT CHOSEN YET";
+        }
+
         public void update() {
             rotate.setPower(rotateSpeed);
         }

@@ -22,6 +22,7 @@ import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
 import dev.nextftc.extensions.pedro.PedroComponent;
 
+import org.firstinspires.ftc.teamcode.RobotConfig;
 import org.firstinspires.ftc.teamcode.Subsystems.Flicker;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.HoodedShooter;
@@ -42,13 +43,17 @@ public class MainTeleOp extends NextFTCOpMode {
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE,
                 new PedroComponent(Constants::createFollower),
-                new SubsystemComponent(HoodedShooter.INSTANCE, Intake.INSTANCE, Flicker.INSTANCE)
+                new SubsystemComponent(
+                        HoodedShooter.INSTANCE,
+                        Intake.INSTANCE,
+                        Flicker.INSTANCE
+                )
         );
     }
 
     /* VARIABLES */
     private final MotorEx frontLeftMotor = new MotorEx("left_front").brakeMode();
-    private final MotorEx frontRightMotor = new MotorEx("right_front").reversed().brakeMode();
+    private final MotorEx frontRightMotor = new MotorEx("right_front").brakeMode();
     private final MotorEx backLeftMotor = new MotorEx("left_back").brakeMode();
     private final MotorEx backRightMotor = new MotorEx("right_back").brakeMode();
     private final IMUEx imu = new IMUEx("imu", Direction.UP, Direction.FORWARD).zeroed();
@@ -58,7 +63,8 @@ public class MainTeleOp extends NextFTCOpMode {
     public void onWaitForStart() {
         HoodedShooter.INSTANCE.turret.updateDesiredTagID(gamepad1.circle, gamepad2.cross);
 
-        telemetry.addLine("Connect Instruction: adb connect 192.168.43.1\nStatus: adb devices\nDisconnect: adb disconnect");
+        telemetry.addLine("\nCIRCLE = RED, CROSS = BLUE");
+        telemetry.addData("\nCurrent Alliance: ", HoodedShooter.INSTANCE.turret.getCurrentAlliance());
         telemetry.update();
     }
 
@@ -99,9 +105,10 @@ public class MainTeleOp extends NextFTCOpMode {
 
         // FLICKER
         // PUSH: UpRight = triangle, Left = square, DownRight = cross
-        Flicker.INSTANCE.setArmState(Flicker.ArmName.UpRight, gamepad2.triangle);
-        Flicker.INSTANCE.setArmState(Flicker.ArmName.Left, gamepad2.square);
-        Flicker.INSTANCE.setArmState(Flicker.ArmName.DownRight, gamepad2.cross);
+        Flicker.INSTANCE.setArmState(RobotConfig.BallSlotName.UpRight  , gamepad2.triangle);
+        Flicker.INSTANCE.setArmState(RobotConfig.BallSlotName.Left     , gamepad2.square);
+        Flicker.INSTANCE.setArmState(RobotConfig.BallSlotName.DownRight, gamepad2.cross);
+
 
         // DEBUG
         telemetry.addLine("\n====# GAMEPAD1 JOYSTICK #====")
@@ -118,8 +125,8 @@ public class MainTeleOp extends NextFTCOpMode {
                 .addData("\npercentage reached: "   , HoodedShooter.INSTANCE.shooter.getCurrentPercentage());
 
         telemetry.addLine("\n====# Turret #====")
-                .addData("\ngamepad2.left_stick_x: ", gamepad2.left_stick_x)
-                .addData("\nTurret rotateSpeed: ", HoodedShooter.INSTANCE.turret.rotateSpeed)
+                .addData("\ngamepad2.left_stick_x: "  , gamepad2.left_stick_x)
+                .addData("\nTurret rotateSpeed: "     , HoodedShooter.INSTANCE.turret.rotateSpeed)
                 .addData("\nServoTurretRotate speed: ", HoodedShooter.INSTANCE.turret.getRotateSpeed());
 
         telemetry.addLine("\n====# INTAKE #====")
@@ -128,12 +135,12 @@ public class MainTeleOp extends NextFTCOpMode {
 
         telemetry.addLine("\n====# FLICKER #====")
                 .addData("\ngamepad2.triangle: "         , gamepad2.triangle)
-                .addData("\nServoArmUpRight position: "  , Flicker.INSTANCE.getArmPos(Flicker.ArmName.UpRight))
+                .addData("\nServoArmUpRight position: "  , Flicker.INSTANCE.getArmPos(RobotConfig.BallSlotName.UpRight))
                 .addData("\ngamepad2.square: "           , gamepad2.square)
-                .addData("\nServoArmLeft position: "     , Flicker.INSTANCE.getArmPos(Flicker.ArmName.Left))
+                .addData("\nServoArmLeft position: "     , Flicker.INSTANCE.getArmPos(RobotConfig.BallSlotName.Left))
                 .addData("\ngamepad2.cross: "            , gamepad2.cross)
-                .addData("\nArm_DownRight state: "       , Flicker.INSTANCE.getArmState(Flicker.ArmName.DownRight))
-                .addData("\nServoArmDownRight position: ", Flicker.INSTANCE.getArmPos(Flicker.ArmName.DownRight));
+                .addData("\nArm_DownRight state: "       , Flicker.INSTANCE.getArmState(RobotConfig.BallSlotName.DownRight))
+                .addData("\nServoArmDownRight position: ", Flicker.INSTANCE.getArmPos(RobotConfig.BallSlotName.DownRight));
 
         telemetry.update();
     }
@@ -146,8 +153,8 @@ public class MainTeleOp extends NextFTCOpMode {
 
         Intake.INSTANCE.rest();
 
-        Flicker.INSTANCE.setArmState(Flicker.ArmName.UpRight, false);
-        Flicker.INSTANCE.setArmState(Flicker.ArmName.Left, false);
-        Flicker.INSTANCE.setArmState(Flicker.ArmName.DownRight, false);
+        Flicker.INSTANCE.setArmState(RobotConfig.BallSlotName.UpRight  , false);
+        Flicker.INSTANCE.setArmState(RobotConfig.BallSlotName.Left     , false);
+        Flicker.INSTANCE.setArmState(RobotConfig.BallSlotName.DownRight, false);
     }
 }

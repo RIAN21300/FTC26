@@ -19,6 +19,7 @@ public class Camera implements Subsystem {
     private HardwareMap hardwareMap;
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
+    public List<AprilTagDetection> detectionList;
 
     /* SUBSYSTEM FUNCTIONS */
     @Override
@@ -35,7 +36,7 @@ public class Camera implements Subsystem {
 
     @Override
     public void periodic() {
-
+        detectionList = aprilTag.getDetections();
     }
 
     /* API */

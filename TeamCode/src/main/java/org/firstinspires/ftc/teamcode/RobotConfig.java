@@ -24,4 +24,16 @@ public class RobotConfig {
     // WEBCAM
     public static final String WEBCAM = "Webcam";
     public static final String COLOR_WEBCAM = "ColorWebcam";
+
+    // ENUM
+    public enum BallSlotName {
+        UpRight,
+        Left,
+        DownRight
+    }
+
+    public enum BallColor {
+        Green,
+        Purple
+    }
 }
