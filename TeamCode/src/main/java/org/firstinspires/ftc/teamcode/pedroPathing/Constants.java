@@ -27,8 +27,8 @@ public class Constants {
                 .rightRearMotorName("right_back")
                 .leftRearMotorName("left_back")
                 .leftFrontMotorName("left_front")
-                .leftFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
-                .leftRearMotorDirection(DcMotorSimple.Direction.REVERSE)
+                .leftFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
+                .leftRearMotorDirection(DcMotorSimple.Direction.FORWARD)
                 .rightFrontMotorDirection(DcMotorSimple.Direction.FORWARD)
                 .rightRearMotorDirection(DcMotorSimple.Direction.FORWARD);
         public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);

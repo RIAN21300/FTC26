@@ -20,28 +20,7 @@ import dev.nextftc.core.subsystems.Subsystem;
 public class ColorCamera implements Subsystem {
     public static final ColorCamera INSTANCE = new ColorCamera();
 
-    /* VARIABLES */
-    private final Point[] ballPosition = {
-            new Point(0,0),       //Average estimate position
-            new Point(0,0),
-            new Point(0,0)
-    };                                             //TODO: tune this later to align with ball position in floor
-
-    private final double THRESHOLD = 10;           //TODO: tune this later
-
-    HardwareMap hardwareMap;
-    public ColorBlobLocatorProcessor[] colorLocator = new ColorBlobLocatorProcessor[2];
-    private final ColorRange[] colorRanges = {
-            ColorRange.ARTIFACT_GREEN,
-            ColorRange.ARTIFACT_PURPLE
-    };
-    private final int colorCount = 2;
-    public VisionPortal visionPortal;
-    public List<ColorBlobLocatorProcessor.Blob> greenBlobList, purpleBlobList;
-
-    /* SUBSYSTEM FUNCTIONS */
-    @Override
-    public void initialize() {
+    public void initColorCamera(HardwareMap hardwareMap) {
         for (int i = 0; i < colorCount; ++i) {
             colorLocator[i] = new ColorBlobLocatorProcessor.Builder()
                     .setTargetColorRange(colorRanges[i])   // use a predefined color match
@@ -58,6 +37,27 @@ public class ColorCamera implements Subsystem {
                     .build();
         }
     }
+
+    /* VARIABLES */
+    private final Point[] ballPosition = {
+            new Point(0,0),            //Average estimate position
+            new Point(0,0),
+            new Point(0,0)
+    };                                             //TODO: tune this later to align with ball position on floor
+
+    private final double THRESHOLD = 10;           //TODO: tune this later
+
+    public ColorBlobLocatorProcessor[] colorLocator = new ColorBlobLocatorProcessor[2];
+    private final ColorRange[] colorRanges = {
+            ColorRange.ARTIFACT_GREEN,
+            ColorRange.ARTIFACT_PURPLE
+    };
+    private final int colorCount = 2;
+    public VisionPortal visionPortal;
+    public List<ColorBlobLocatorProcessor.Blob> greenBlobList, purpleBlobList;
+
+    /* SUBSYSTEM FUNCTIONS */
+
 
     /* API */
     public void updateBlobList() {

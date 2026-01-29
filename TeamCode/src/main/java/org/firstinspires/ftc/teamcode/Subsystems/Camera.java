@@ -15,15 +15,7 @@ import dev.nextftc.core.subsystems.Subsystem;
 public class Camera implements Subsystem {
     public static final Camera INSTANCE = new Camera();
 
-    /* VARIABLES */
-    private HardwareMap hardwareMap;
-    private AprilTagProcessor aprilTag;
-    private VisionPortal visionPortal;
-    public List<AprilTagDetection> detectionList;
-
-    /* SUBSYSTEM FUNCTIONS */
-    @Override
-    public void initialize() {
+    public void initCamera(HardwareMap hardwareMap) {
         aprilTag = new AprilTagProcessor.Builder()
                 .build();
         aprilTag.setDecimation(3);
@@ -34,6 +26,12 @@ public class Camera implements Subsystem {
                 .build();
     }
 
+    /* VARIABLES */
+    private AprilTagProcessor aprilTag;
+    private VisionPortal visionPortal;
+    public List<AprilTagDetection> detectionList;
+
+    /* SUBSYSTEM FUNCTIONS */
     @Override
     public void periodic() {
         detectionList = aprilTag.getDetections();

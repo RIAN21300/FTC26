@@ -86,18 +86,13 @@ public class HoodedShooter implements Subsystem {
             return rotate.getPower();
         }
 
-        public void updateDesiredTagID(boolean RED, boolean BLUE) {
-            if (RED) DESIRED_TAG_ID = 24;
-            if (BLUE) DESIRED_TAG_ID = 20;
-        }
-
-        public String getCurrentAlliance() {
-            if (DESIRED_TAG_ID == 24)
-                return "RED";
-            if (DESIRED_TAG_ID == 20)
-                return "BLUE";
-
-            return "NOT CHOSEN YET";
+        public void updateDesiredTagID(RobotConfig.AllianceName Alliance) {
+            if (Alliance == RobotConfig.AllianceName.Red) {
+                DESIRED_TAG_ID = 24;
+            }
+            if (Alliance == RobotConfig.AllianceName.Blue) {
+                DESIRED_TAG_ID = 20;
+            }
         }
 
         public void update() {

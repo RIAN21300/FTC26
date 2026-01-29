@@ -23,6 +23,8 @@ import dev.nextftc.core.components.SubsystemComponent;
 import dev.nextftc.extensions.pedro.PedroComponent;
 
 import org.firstinspires.ftc.teamcode.RobotConfig;
+import org.firstinspires.ftc.teamcode.Subsystems.Camera;
+import org.firstinspires.ftc.teamcode.Subsystems.ColorCamera;
 import org.firstinspires.ftc.teamcode.Subsystems.Flicker;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.HoodedShooter;
@@ -52,6 +54,8 @@ public class MainTeleOp extends NextFTCOpMode {
     }
 
     /* VARIABLES */
+    private RobotConfig.AllianceName currentAlliance;
+    // Drivetrain
     private final MotorEx frontLeftMotor = new MotorEx("left_front").brakeMode();
     private final MotorEx frontRightMotor = new MotorEx("right_front").brakeMode();
     private final MotorEx backLeftMotor = new MotorEx("left_back").brakeMode();
@@ -60,11 +64,28 @@ public class MainTeleOp extends NextFTCOpMode {
 
     /* OPMODE FUNCTIONS */
     @Override
-    public void onWaitForStart() {
-        HoodedShooter.INSTANCE.turret.updateDesiredTagID(gamepad1.circle, gamepad2.cross);
+    public void onInit() {
+        currentAlliance = RobotConfig.AllianceName.Blue; // Default Alliance
 
-        telemetry.addLine("\nCIRCLE = RED, CROSS = BLUE");
-        telemetry.addData("\nCurrent Alliance: ", HoodedShooter.INSTANCE.turret.getCurrentAlliance());
+        Camera.INSTANCE.initCamera(hardwareMap);
+        ColorCamera.INSTANCE.initColorCamera(hardwareMap);
+    }
+
+    @Override
+    public void onWaitForStart() {
+        // Choosing Alliance: gamepad1: dpad_right = RED, dpad_left = BLUE
+        if (gamepad1.dpad_right) {
+            currentAlliance = RobotConfig.AllianceName.Red;
+        }
+        if (gamepad1.dpad_left) {
+            currentAlliance = RobotConfig.AllianceName.Blue;
+        }
+
+        HoodedShooter.INSTANCE.turret.updateDesiredTagID(currentAlliance);
+
+        telemetry.addLine("\nChoose Your Alliance (GAMEPAD 1)");
+        telemetry.addLine("\nDPAD RIGHT = RED, DPAD LEFT = BLUE");
+        telemetry.addData("\nCurrent Alliance", currentAlliance);
         telemetry.update();
     }
 
@@ -112,35 +133,35 @@ public class MainTeleOp extends NextFTCOpMode {
 
         // DEBUG
         telemetry.addLine("\n====# GAMEPAD1 JOYSTICK #====")
-                .addData("\ngamepad1.left_stick_y [negated]: ", -gamepad1.left_stick_y)
-                .addData("\ngamepad1.left_stick_x: "          , gamepad1.left_stick_x)
-                .addData("\ngamepad1.right_stick_x: "         , gamepad1.right_stick_x);
+                .addData("\ngamepad1.left_stick_y [negated]", -gamepad1.left_stick_y)
+                .addData("\ngamepad1.left_stick_x"          , gamepad1.left_stick_x)
+                .addData("\ngamepad1.right_stick_x"         , gamepad1.right_stick_x);
 
         telemetry.addLine("\n====# SHOOTER #====")
-                .addData("\ngamepad2.left_bumper: " , gamepad2.left_bumper)
+                .addData("\ngamepad2.left_bumper" , gamepad2.left_bumper)
 //                .addData("\nMotorShooter power: "   , Shooter.INSTANCE.get_power())
 //                .addData("\nMotorShooter velocity: ", Shooter.INSTANCE.get_vel())
 //                .addData("Shooter goal: "         , Shooter.INSTANCE.get_goal())
 //                .addData("Shooter state: "        , Shooter.INSTANCE.state)
-                .addData("\npercentage reached: "   , HoodedShooter.INSTANCE.shooter.getCurrentPercentage());
+                .addData("\npercentage reached"   , HoodedShooter.INSTANCE.shooter.getCurrentPercentage());
 
         telemetry.addLine("\n====# Turret #====")
-                .addData("\ngamepad2.left_stick_x: "  , gamepad2.left_stick_x)
-                .addData("\nTurret rotateSpeed: "     , HoodedShooter.INSTANCE.turret.rotateSpeed)
-                .addData("\nServoTurretRotate speed: ", HoodedShooter.INSTANCE.turret.getRotateSpeed());
+                .addData("\ngamepad2.left_stick_x"  , gamepad2.left_stick_x)
+                .addData("\nTurret rotateSpeed"     , HoodedShooter.INSTANCE.turret.rotateSpeed)
+                .addData("\nServoTurretRotate speed", HoodedShooter.INSTANCE.turret.getRotateSpeed());
 
         telemetry.addLine("\n====# INTAKE #====")
-                .addData("\ngamepad2.right_bumper: ", gamepad2.right_bumper)
-                .addData("\nMotorIntake power: "    , Intake.INSTANCE.get_power());
+                .addData("\ngamepad2.right_bumper", gamepad2.right_bumper)
+                .addData("\nMotorIntake power"    , Intake.INSTANCE.get_power());
 
         telemetry.addLine("\n====# FLICKER #====")
-                .addData("\ngamepad2.triangle: "         , gamepad2.triangle)
-                .addData("\nServoArmUpRight position: "  , Flicker.INSTANCE.getArmPos(RobotConfig.BallSlotName.UpRight))
-                .addData("\ngamepad2.square: "           , gamepad2.square)
-                .addData("\nServoArmLeft position: "     , Flicker.INSTANCE.getArmPos(RobotConfig.BallSlotName.Left))
-                .addData("\ngamepad2.cross: "            , gamepad2.cross)
-                .addData("\nArm_DownRight state: "       , Flicker.INSTANCE.getArmState(RobotConfig.BallSlotName.DownRight))
-                .addData("\nServoArmDownRight position: ", Flicker.INSTANCE.getArmPos(RobotConfig.BallSlotName.DownRight));
+                .addData("\ngamepad2.triangle"         , gamepad2.triangle)
+                .addData("\nServoArmUpRight position"  , Flicker.INSTANCE.getArmPos(RobotConfig.BallSlotName.UpRight))
+                .addData("\ngamepad2.square"           , gamepad2.square)
+                .addData("\nServoArmLeft position"     , Flicker.INSTANCE.getArmPos(RobotConfig.BallSlotName.Left))
+                .addData("\ngamepad2.cross"            , gamepad2.cross)
+                .addData("\nArm_DownRight state"       , Flicker.INSTANCE.getArmState(RobotConfig.BallSlotName.DownRight))
+                .addData("\nServoArmDownRight position", Flicker.INSTANCE.getArmPos(RobotConfig.BallSlotName.DownRight));
 
         telemetry.update();
     }

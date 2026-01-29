@@ -15,6 +15,7 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 
 import org.firstinspires.ftc.teamcode.RobotConfig;
 
+import dev.nextftc.core.commands.delays.Delay;
 import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.hardware.impl.ServoEx;
 
@@ -32,8 +33,8 @@ public class Flicker implements Subsystem {
         }
 
         // Variables
-        private static final double LIFT_POS = 8.0/9.0;
-        private static final double REST_POS = 1.0/9.0;
+        private double LIFT_POS = 8.0/9.0;
+        private double REST_POS = 1.0/9.0;
         private final ServoEx servo;
         private boolean state;
 
@@ -46,9 +47,41 @@ public class Flicker implements Subsystem {
             state = newState;
         }
 
+        public void reverse() {
+            LIFT_POS = 1.0/9.0;        // Reversed Arm position
+            REST_POS = 8.0/9.0;
+        }
+
         public void update() {
             if (state) servo.setPosition(LIFT_POS);
             else servo.setPosition(REST_POS);
+        }
+
+        public void autoFlickMotif(String pattern) {
+            for (int i = 0; i < pattern.length(); ++i) {
+
+                if (pattern.charAt(i) == 'G') {
+                    for (RobotConfig.BallSlotName slotName : RobotConfig.BallSlotName.values()) {
+                        if (ColorCamera.INSTANCE.checkSlotForGreen(slotName)) {
+                            Flicker.INSTANCE.setArmState(slotName, true);
+                            new Delay(2);
+                            Flicker.INSTANCE.setArmState(slotName, false);
+                            break;
+                        }
+                    }
+                }
+
+                if (pattern.charAt(i) == 'P') {
+                    for (RobotConfig.BallSlotName slotName : RobotConfig.BallSlotName.values()) {
+                        if (ColorCamera.INSTANCE.checkSlotForPurple(slotName)) {
+                            Flicker.INSTANCE.setArmState(slotName, true);
+                            new Delay(2);
+                            Flicker.INSTANCE.setArmState(slotName, false);
+                            break;
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -60,6 +93,12 @@ public class Flicker implements Subsystem {
         for (int i = 0; i < armCount; ++i) {
             arms[i] = new Arm(RobotConfig.SERVO_FLICKER[i]);
             arms[i].setState(false);
+        }
+
+        arms[2].reverse();
+
+        for (int i = 0; i < armCount; ++i) {
+            arms[i].update();
         }
     }
 

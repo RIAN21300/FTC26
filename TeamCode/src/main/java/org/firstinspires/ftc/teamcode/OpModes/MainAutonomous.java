@@ -1,6 +1,21 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
+/*
+ /\_/\  /\_/\  /\_/\  /\_/\
+( o.o )( o.o )( o.o )( o.o )
+ > ^ <  > ^ <  > ^ <  > ^ <
+ /\_/\                /\_/\
+( o.o )   ghelopax   ( o.o )
+ > ^ <                > ^ <
+ /\_/\  /\_/\  /\_/\  /\_/\
+( o.o )( o.o )( o.o )( o.o )
+ > ^ <  > ^ <  > ^ <  > ^ <
+*/
+
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.RobotConfig;
 import org.firstinspires.ftc.teamcode.Subsystems.Camera;
@@ -39,79 +54,131 @@ public class MainAutonomous extends NextFTCOpMode {
     }
 
     /* VARIABLES */
-    // DRIVETRAIN
+    // Drivetrain
+//    AutoDrivetrain autoDrivetrain = new AutoDrivetrain(hardwareMap);
     private final MotorEx frontLeftMotor = new MotorEx("left_front").brakeMode();
     private final MotorEx frontRightMotor = new MotorEx("right_front").brakeMode();
     private final MotorEx backLeftMotor = new MotorEx("left_back").brakeMode();
     private final MotorEx backRightMotor = new MotorEx("right_back").brakeMode();
     private final IMUEx imu = new IMUEx("imu", Direction.UP, Direction.FORWARD).zeroed();
+    // Info
+    AutoInfoManager autoInfoManager;
 
-    // MOTIF
-    private int patternID = -1;
+    /* OPMODE FUNCTIONS */
+    @Override
+    public void onInit() {
+        Camera.INSTANCE.initCamera(hardwareMap);
+        ColorCamera.INSTANCE.initColorCamera(hardwareMap);
+
+        // Choosing Alliance: gamepad1: dpad_right = RED, dpad_left = BLUE
+        autoInfoManager.updateAlliance(RobotConfig.AllianceName.NotChosenYet);
+
+        telemetry.addLine("\nChoose Your Alliance (GAMEPAD 1 DPAD)");
+        telemetry.addLine("\nRIGHT = RED, LEFT = BLUE");
+        telemetry.update();
+
+        while (autoInfoManager.currentAlliance == RobotConfig.AllianceName.NotChosenYet) {
+            autoInfoManager.updateAlliance(gamepad1.dpad_right, gamepad1.dpad_left);
+        }
+
+        telemetry.addData("\nCurrent Alliance", autoInfoManager.currentAlliance);
+        telemetry.update();
+
+        HoodedShooter.INSTANCE.turret.updateDesiredTagID(autoInfoManager.currentAlliance);
+
+        new Delay(1.0);
+    }
+
+    @Override
+    public void onWaitForStart() {
+
+    }
+
+    @Override
+    public void onStartButtonPressed() {
+    }
+
+    @Override
+    public void onUpdate() {
+
+    }
+}
+
+class AutoInfoManager {
+    /* Alliance */
+    public RobotConfig.AllianceName currentAlliance;
+
+    /* Pattern (MOTIF) */
+    public int patternID = -1;
+    public String currentPattern;
     private final String[] patternList = {
             "GPP",
             "PGP",
             "PPG"
     };
 
-    private void flickWithPattern(String pattern) {
-        for (int i = 0; i < pattern.length(); ++i) {
-
-            if (pattern.charAt(i) == 'G') {
-                for (RobotConfig.BallSlotName slotName : RobotConfig.BallSlotName.values()) {
-                    if (ColorCamera.INSTANCE.checkSlotForGreen(slotName)) {
-                        Flicker.INSTANCE.setArmState(slotName, true);
-                        new Delay(2);
-                        Flicker.INSTANCE.setArmState(slotName, false);
-                        break;
-                    }
-                }
-            }
-
-            if (pattern.charAt(i) == 'P') {
-                for (RobotConfig.BallSlotName slotName : RobotConfig.BallSlotName.values()) {
-                    if (ColorCamera.INSTANCE.checkSlotForPurple(slotName)) {
-                        Flicker.INSTANCE.setArmState(slotName, true);
-                        new Delay(2);
-                        Flicker.INSTANCE.setArmState(slotName, false);
-                        break;
-                    }
-                }
-            }
+    /* API */
+    public void updateAlliance(boolean RED, boolean BLUE) {
+        if (RED) {
+            currentAlliance = RobotConfig.AllianceName.Red;
+        }
+        if (BLUE) {
+            currentAlliance = RobotConfig.AllianceName.Blue;
         }
     }
 
-    /* OPMODE FUNCTIONS */
-    @Override
-    public void onStartButtonPressed() {
-//        while (patternID == -1) {
-//
-//        }
-        patternID = 1;
-
-        String currentPattern = patternList[patternID];
-
-        backLeftMotor.setPower(1.0);
-        backRightMotor.setPower(1.0);
-        frontLeftMotor.setPower(1.0);
-        frontRightMotor.setPower(1.0);
-        Intake.INSTANCE.run();
-
-        new Delay(3);
-
-        backLeftMotor.setPower(0.0);
-        backRightMotor.setPower(0.0);
-        frontLeftMotor.setPower(0.0);
-        frontRightMotor.setPower(0.0);
-        Intake.INSTANCE.rest();
-
-        flickWithPattern(currentPattern);
+    public void updateAlliance(RobotConfig.AllianceName newAlliance) {
+        currentAlliance = newAlliance;
     }
 
-    @Override
-    public void onUpdate() {
+    public boolean updatePattern() {
+        if (patternID != -1) {
+            currentPattern = patternList[patternID];
+            return true;
+        }
 
+        return false;
+    }
+}
 
+class AutoDrivetrain { // Using PedroPathing
+    public AutoDrivetrain(HardwareMap hardwareMap) {
+        follower = Constants.createFollower(hardwareMap);
+    }
+    /* Follower */
+    private final Follower follower;
 
+    /* Pose on Zone */
+    private Pose start = new Pose();
+    private Pose score = new Pose();
+    private Pose park = new Pose();
+
+    /* API */
+    public void updatePose(RobotConfig.AllianceName Alliance, boolean startNearGoal) {
+        if (Alliance == RobotConfig.AllianceName.Blue) {
+            start = (
+                    startNearGoal
+                            ? new Pose()
+                            : new Pose(56, 8, Math.toRadians(90))
+            );
+            score = (
+                    startNearGoal
+                            ? new Pose()
+                            : new Pose()
+            );
+        }
+
+        if (Alliance == RobotConfig.AllianceName.Red) {
+            start = (
+                    startNearGoal
+                            ? new Pose()
+                            : new Pose(88, 8, Math.toRadians(90))
+            );
+            score = (
+                    startNearGoal
+                            ? new Pose()
+                            : new Pose()
+            );
+        }
     }
 }

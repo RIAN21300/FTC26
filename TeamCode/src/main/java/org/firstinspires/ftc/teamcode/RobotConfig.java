@@ -36,4 +36,10 @@ public class RobotConfig {
         Green,
         Purple
     }
+
+    public enum AllianceName {
+        Red,
+        Blue,
+        NotChosenYet
+    }
 }
