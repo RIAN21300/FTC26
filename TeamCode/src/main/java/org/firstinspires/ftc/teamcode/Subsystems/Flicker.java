@@ -37,24 +37,34 @@ public class Flicker implements Subsystem {
         private double REST_POS = 1.0/9.0;
         private final ServoEx servo;
         private boolean state;
+        private static boolean busy;
 
         // API
         public double getPos() {
             return servo.getPosition();
         }
 
-        public void setState(boolean newState) {
-            state = newState;
+        public void run() {
+            Arm.busy = true;
+            lift();
+
+            new Delay(1.0);
+
+            rest();
+            Arm.busy = false;
+        }
+
+        public void lift() {
+            servo.setPosition(LIFT_POS);
+        }
+
+        public void rest() {
+            servo.setPosition(REST_POS);
         }
 
         public void reverse() {
             LIFT_POS = 1.0/9.0;        // Reversed Arm position
             REST_POS = 8.0/9.0;
-        }
-
-        public void update() {
-            if (state) servo.setPosition(LIFT_POS);
-            else servo.setPosition(REST_POS);
         }
 
         public void autoFlickMotif(String pattern) {
@@ -63,9 +73,7 @@ public class Flicker implements Subsystem {
                 if (pattern.charAt(i) == 'G') {
                     for (RobotConfig.BallSlotName slotName : RobotConfig.BallSlotName.values()) {
                         if (ColorCamera.INSTANCE.checkSlotForGreen(slotName)) {
-                            Flicker.INSTANCE.setArmState(slotName, true);
-                            new Delay(2);
-                            Flicker.INSTANCE.setArmState(slotName, false);
+                            run();
                             break;
                         }
                     }
@@ -74,9 +82,7 @@ public class Flicker implements Subsystem {
                 if (pattern.charAt(i) == 'P') {
                     for (RobotConfig.BallSlotName slotName : RobotConfig.BallSlotName.values()) {
                         if (ColorCamera.INSTANCE.checkSlotForPurple(slotName)) {
-                            Flicker.INSTANCE.setArmState(slotName, true);
-                            new Delay(2);
-                            Flicker.INSTANCE.setArmState(slotName, false);
+                            run();
                             break;
                         }
                     }
@@ -90,32 +96,20 @@ public class Flicker implements Subsystem {
     /* SUBSYSTEM FUNCTIONS */
     @Override
     public void initialize() {
+        Arm.busy = false;
+
         for (int i = 0; i < armCount; ++i) {
             arms[i] = new Arm(RobotConfig.SERVO_FLICKER[i]);
-            arms[i].setState(false);
         }
 
         arms[2].reverse();
-
-        for (int i = 0; i < armCount; ++i) {
-            arms[i].update();
-        }
-    }
-
-    @Override
-    public void periodic() {
-        for (int i = 0; i < armCount; ++i) {
-            arms[i].update();
-        }
     }
 
     /* API */
-    public void setArmState(RobotConfig.BallSlotName armName, boolean newArmState) {
-        arms[armName.ordinal()].setState(newArmState);
-    }
-
-    public boolean getArmState(RobotConfig.BallSlotName armName) {
-        return arms[armName.ordinal()].state;
+    public void runArm(RobotConfig.BallSlotName armName) {
+        if (!Arm.busy) {
+            arms[armName.ordinal()].run();
+        }
     }
 
     public double getArmPos(RobotConfig.BallSlotName armName) {

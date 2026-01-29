@@ -55,7 +55,7 @@ public class MainAutonomous extends NextFTCOpMode {
 
     /* VARIABLES */
     // Drivetrain
-//    AutoDrivetrain autoDrivetrain = new AutoDrivetrain(hardwareMap);
+    AutoDrivetrain autoDrivetrain = new AutoDrivetrain(hardwareMap);
     private final MotorEx frontLeftMotor = new MotorEx("left_front").brakeMode();
     private final MotorEx frontRightMotor = new MotorEx("right_front").brakeMode();
     private final MotorEx backLeftMotor = new MotorEx("left_back").brakeMode();
@@ -77,7 +77,7 @@ public class MainAutonomous extends NextFTCOpMode {
         telemetry.addLine("\nRIGHT = RED, LEFT = BLUE");
         telemetry.update();
 
-        while (autoInfoManager.currentAlliance == RobotConfig.AllianceName.NotChosenYet) {
+        while (autoInfoManager.currentAlliance.equals(RobotConfig.AllianceName.NotChosenYet)) {
             autoInfoManager.updateAlliance(gamepad1.dpad_right, gamepad1.dpad_left);
         }
 
@@ -86,7 +86,7 @@ public class MainAutonomous extends NextFTCOpMode {
 
         HoodedShooter.INSTANCE.turret.updateDesiredTagID(autoInfoManager.currentAlliance);
 
-        new Delay(1.0);
+
     }
 
     @Override
@@ -105,6 +105,9 @@ public class MainAutonomous extends NextFTCOpMode {
 }
 
 class AutoInfoManager {
+    /* Start Position */
+    public boolean startNearGoal;
+
     /* Alliance */
     public RobotConfig.AllianceName currentAlliance;
 
@@ -131,13 +134,14 @@ class AutoInfoManager {
         currentAlliance = newAlliance;
     }
 
-    public boolean updatePattern() {
+    public void updatePattern() {
         if (patternID != -1) {
             currentPattern = patternList[patternID];
-            return true;
         }
+    }
 
-        return false;
+    public void updateStartPosition(boolean StartNearGoal) {
+        startNearGoal = StartNearGoal;
     }
 }
 
@@ -145,40 +149,68 @@ class AutoDrivetrain { // Using PedroPathing
     public AutoDrivetrain(HardwareMap hardwareMap) {
         follower = Constants.createFollower(hardwareMap);
     }
+
     /* Follower */
     private final Follower follower;
 
     /* Pose on Zone */
-    private Pose start = new Pose();
-    private Pose score = new Pose();
-    private Pose park = new Pose();
+    private Pose start;
+    private Pose score;
+    private Pose spikeMark_Goal;
+    private Pose spikeMark_Middle;
+    private Pose spikeMark_LoadingZone;
+    private double MirrorX(boolean mirrored, double x) { // Mirror Pose for Red Alliance
+        return (mirrored ? 144.0 - x : x);
+    }
+    private double MirrorAngle(boolean mirrored, double angle) {
+        return (mirrored ? 180.0 - angle : angle);
+    }
 
     /* API */
     public void updatePose(RobotConfig.AllianceName Alliance, boolean startNearGoal) {
-        if (Alliance == RobotConfig.AllianceName.Blue) {
-            start = (
-                    startNearGoal
-                            ? new Pose()
-                            : new Pose(56, 8, Math.toRadians(90))
-            );
-            score = (
-                    startNearGoal
-                            ? new Pose()
-                            : new Pose()
-            );
-        }
+        boolean mirrored = Alliance.equals(RobotConfig.AllianceName.Red);
 
-        if (Alliance == RobotConfig.AllianceName.Red) {
-            start = (
-                    startNearGoal
-                            ? new Pose()
-                            : new Pose(88, 8, Math.toRadians(90))
-            );
-            score = (
-                    startNearGoal
-                            ? new Pose()
-                            : new Pose()
-            );
-        }
+        start = (
+                startNearGoal
+                        ? new Pose(
+                                MirrorX(mirrored, 21),
+                                123,
+                                Math.toRadians(MirrorAngle(mirrored, -35))
+                        )
+                        : new Pose(
+                                MirrorX(mirrored, 56),
+                                8,
+                                Math.toRadians(MirrorAngle(mirrored, 90))
+                        )
+        );
+        score = (
+                startNearGoal
+                        ? new Pose(
+                                72,
+                                72,
+                                Math.toRadians(MirrorAngle(mirrored, 135))
+                )
+                        : new Pose(
+                                MirrorX(mirrored, 56),
+                                8,
+                                Math.toRadians(MirrorAngle(mirrored, 121))
+                )
+        );
+
+        spikeMark_Goal        = new Pose(
+                MirrorX(mirrored, 48),
+                84,
+                Math.toRadians(MirrorAngle(mirrored, 180))
+        );
+        spikeMark_Middle      = new Pose(
+                MirrorX(mirrored, 48),
+                60,
+                Math.toRadians(MirrorAngle(mirrored, 180))
+        );
+        spikeMark_LoadingZone = new Pose(
+                MirrorX(mirrored, 48),
+                36,
+                Math.toRadians(MirrorAngle(mirrored, 180))
+        );
     }
 }

@@ -24,7 +24,6 @@ import dev.nextftc.extensions.pedro.PedroComponent;
 
 import org.firstinspires.ftc.teamcode.RobotConfig;
 import org.firstinspires.ftc.teamcode.Subsystems.Camera;
-import org.firstinspires.ftc.teamcode.Subsystems.ColorCamera;
 import org.firstinspires.ftc.teamcode.Subsystems.Flicker;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.HoodedShooter;
@@ -49,6 +48,7 @@ public class MainTeleOp extends NextFTCOpMode {
                         HoodedShooter.INSTANCE,
                         Intake.INSTANCE,
                         Flicker.INSTANCE
+//                        Camera.INSTANCE
                 )
         );
     }
@@ -56,9 +56,9 @@ public class MainTeleOp extends NextFTCOpMode {
     /* VARIABLES */
     private RobotConfig.AllianceName currentAlliance;
     // Drivetrain
-    private final MotorEx frontLeftMotor = new MotorEx("left_front").brakeMode();
+    private final MotorEx frontLeftMotor = new MotorEx("left_front").brakeMode().reversed();
     private final MotorEx frontRightMotor = new MotorEx("right_front").brakeMode();
-    private final MotorEx backLeftMotor = new MotorEx("left_back").brakeMode();
+    private final MotorEx backLeftMotor = new MotorEx("left_back").brakeMode().reversed();
     private final MotorEx backRightMotor = new MotorEx("right_back").brakeMode();
     private final IMUEx imu = new IMUEx("imu", Direction.UP, Direction.FORWARD).zeroed();
 
@@ -67,8 +67,7 @@ public class MainTeleOp extends NextFTCOpMode {
     public void onInit() {
         currentAlliance = RobotConfig.AllianceName.Blue; // Default Alliance
 
-        Camera.INSTANCE.initCamera(hardwareMap);
-        ColorCamera.INSTANCE.initColorCamera(hardwareMap);
+//        Camera.INSTANCE.initCamera(hardwareMap);
     }
 
     @Override
@@ -126,10 +125,12 @@ public class MainTeleOp extends NextFTCOpMode {
 
         // FLICKER
         // PUSH: UpRight = triangle, Left = square, DownRight = cross
-        Flicker.INSTANCE.setArmState(RobotConfig.BallSlotName.UpRight  , gamepad2.triangle);
-        Flicker.INSTANCE.setArmState(RobotConfig.BallSlotName.Left     , gamepad2.square);
-        Flicker.INSTANCE.setArmState(RobotConfig.BallSlotName.DownRight, gamepad2.cross);
-
+        button(() -> gamepad2.triangle)
+                .whenBecomesTrue(() -> Flicker.INSTANCE.runArm(RobotConfig.BallSlotName.UpRight));
+        button(() -> gamepad2.square)
+                .whenBecomesTrue(() -> Flicker.INSTANCE.runArm(RobotConfig.BallSlotName.Left));
+        button(() -> gamepad2.cross)
+                .whenBecomesTrue(() -> Flicker.INSTANCE.runArm(RobotConfig.BallSlotName.DownRight));
 
         // DEBUG
         telemetry.addLine("\n====# GAMEPAD1 JOYSTICK #====")
@@ -138,30 +139,29 @@ public class MainTeleOp extends NextFTCOpMode {
                 .addData("\ngamepad1.right_stick_x"         , gamepad1.right_stick_x);
 
         telemetry.addLine("\n====# SHOOTER #====")
-                .addData("\ngamepad2.left_bumper" , gamepad2.left_bumper)
+                .addData("\ngamepad2.left_bumper"           , gamepad2.left_bumper)
 //                .addData("\nMotorShooter power: "   , Shooter.INSTANCE.get_power())
-//                .addData("\nMotorShooter velocity: ", Shooter.INSTANCE.get_vel())
+                .addData("\nMotorShooter velocity: "        , HoodedShooter.INSTANCE.shooter.getVelocity())
 //                .addData("Shooter goal: "         , Shooter.INSTANCE.get_goal())
 //                .addData("Shooter state: "        , Shooter.INSTANCE.state)
-                .addData("\npercentage reached"   , HoodedShooter.INSTANCE.shooter.getCurrentPercentage());
+                .addData("\npercentage reached"             , HoodedShooter.INSTANCE.shooter.getCurrentPercentage());
 
         telemetry.addLine("\n====# Turret #====")
-                .addData("\ngamepad2.left_stick_x"  , gamepad2.left_stick_x)
-                .addData("\nTurret rotateSpeed"     , HoodedShooter.INSTANCE.turret.rotateSpeed)
-                .addData("\nServoTurretRotate speed", HoodedShooter.INSTANCE.turret.getRotateSpeed());
+                .addData("\ngamepad2.left_stick_x"          , gamepad2.left_stick_x)
+                .addData("\nTurret rotateSpeed"             , HoodedShooter.INSTANCE.turret.rotateSpeed)
+                .addData("\nServoTurretRotate speed"        , HoodedShooter.INSTANCE.turret.getRotateSpeed());
 
         telemetry.addLine("\n====# INTAKE #====")
-                .addData("\ngamepad2.right_bumper", gamepad2.right_bumper)
-                .addData("\nMotorIntake power"    , Intake.INSTANCE.get_power());
+                .addData("\ngamepad2.right_bumper"          , gamepad2.right_bumper)
+                .addData("\nMotorIntake power"              , Intake.INSTANCE.get_power());
 
         telemetry.addLine("\n====# FLICKER #====")
-                .addData("\ngamepad2.triangle"         , gamepad2.triangle)
-                .addData("\nServoArmUpRight position"  , Flicker.INSTANCE.getArmPos(RobotConfig.BallSlotName.UpRight))
-                .addData("\ngamepad2.square"           , gamepad2.square)
-                .addData("\nServoArmLeft position"     , Flicker.INSTANCE.getArmPos(RobotConfig.BallSlotName.Left))
-                .addData("\ngamepad2.cross"            , gamepad2.cross)
-                .addData("\nArm_DownRight state"       , Flicker.INSTANCE.getArmState(RobotConfig.BallSlotName.DownRight))
-                .addData("\nServoArmDownRight position", Flicker.INSTANCE.getArmPos(RobotConfig.BallSlotName.DownRight));
+                .addData("\ngamepad2.triangle"              , gamepad2.triangle)
+                .addData("\nServoArmUpRight position"       , Flicker.INSTANCE.getArmPos(RobotConfig.BallSlotName.UpRight))
+                .addData("\ngamepad2.square"                , gamepad2.square)
+                .addData("\nServoArmLeft position"          , Flicker.INSTANCE.getArmPos(RobotConfig.BallSlotName.Left))
+                .addData("\ngamepad2.cross"                 , gamepad2.cross)
+                .addData("\nServoArmDownRight position"     , Flicker.INSTANCE.getArmPos(RobotConfig.BallSlotName.DownRight));
 
         telemetry.update();
     }
@@ -173,9 +173,5 @@ public class MainTeleOp extends NextFTCOpMode {
         HoodedShooter.INSTANCE.setShooterState(false);
 
         Intake.INSTANCE.rest();
-
-        Flicker.INSTANCE.setArmState(RobotConfig.BallSlotName.UpRight  , false);
-        Flicker.INSTANCE.setArmState(RobotConfig.BallSlotName.Left     , false);
-        Flicker.INSTANCE.setArmState(RobotConfig.BallSlotName.DownRight, false);
     }
 }
