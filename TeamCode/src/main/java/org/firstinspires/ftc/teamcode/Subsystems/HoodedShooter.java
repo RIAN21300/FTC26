@@ -13,6 +13,8 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 */
 
 import org.firstinspires.ftc.teamcode.RobotConfig;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import dev.nextftc.control.ControlSystem;
 import dev.nextftc.control.KineticState;
@@ -70,12 +72,18 @@ public class HoodedShooter implements Subsystem {
         public Turret() {
             DESIRED_TAG_ID = 20;
             rotateSpeed = 0.0;
+
+            controller = ControlSystem.builder()
+                    .posPid(0.05, 0, 0.0001)                //TODO: tune these parameters
+                    .build();
         }
 
         // Variables
-        private int DESIRED_TAG_ID;
+        public int DESIRED_TAG_ID;
         private final CRServoEx rotate = new CRServoEx(RobotConfig.SERVO_TURRET_ROTATE); // Rotating servo
         public double rotateSpeed;
+
+        private ControlSystem controller;
 
         // API
         public void setRotateSpeed(double newSpeed) {
@@ -93,6 +101,12 @@ public class HoodedShooter implements Subsystem {
             if (Alliance == RobotConfig.AllianceName.Blue) {
                 DESIRED_TAG_ID = 20;
             }
+        }
+
+        public void trackTag(double delta) {
+            controller.setGoal(new KineticState(delta));
+
+            setRotateSpeed(controller.calculate(new KineticState(0,0)));
         }
 
         public void update() {
