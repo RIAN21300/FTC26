@@ -28,6 +28,10 @@ import org.firstinspires.ftc.teamcode.Subsystems.Flicker;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.HoodedShooter;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+
+import java.util.List;
+
 import dev.nextftc.ftc.Gamepads;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
@@ -122,6 +126,16 @@ public class MainTeleOp extends NextFTCOpMode {
         // TURRET
         // ANALOG: gamepad2 left stick x
         HoodedShooter.INSTANCE.setTurretRotateSpeed(-gamepad2.left_stick_x);
+
+        if (true) { //TODO: add binding to this part (or cleanup)
+            List<AprilTagDetection> currentTags = Camera.INSTANCE.getDetectionList();
+            for (AprilTagDetection tag : currentTags) {
+                if (tag.id == HoodedShooter.INSTANCE.turret.DESIRED_TAG_ID) {
+                    HoodedShooter.INSTANCE.turret.trackTag(tag.ftcPose.bearing);
+                    break;
+                }
+            }
+        }
 
         // FLICKER
         // PUSH: UpRight = triangle, Left = square, DownRight = cross

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Subsystems;
 
+import android.util.Size;
+
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -23,6 +25,7 @@ public class Camera implements Subsystem {
         visionPortal = new VisionPortal.Builder()
                 .setCamera(hardwareMap.get(WebcamName.class, RobotConfig.WEBCAM))
                 .addProcessor(aprilTag)
+                .setCameraResolution(new Size(640, 480))
                 .build();
     }
 
