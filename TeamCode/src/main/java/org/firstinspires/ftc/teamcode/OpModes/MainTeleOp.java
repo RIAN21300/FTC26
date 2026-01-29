@@ -127,15 +127,7 @@ public class MainTeleOp extends NextFTCOpMode {
         // ANALOG: gamepad2 left stick x
         HoodedShooter.INSTANCE.setTurretRotateSpeed(-gamepad2.left_stick_x);
 
-        if (true) { //TODO: add binding to this part (or cleanup)
-            List<AprilTagDetection> currentTags = Camera.INSTANCE.getDetectionList();
-            for (AprilTagDetection tag : currentTags) {
-                if (tag.id == HoodedShooter.INSTANCE.turret.DESIRED_TAG_ID) {
-                    HoodedShooter.INSTANCE.turret.trackTag(tag.ftcPose.bearing);
-                    break;
-                }
-            }
-        }
+        HoodedShooter.INSTANCE.turret.trackTag(); //TODO: Binding
 
         // FLICKER
         // PUSH: UpRight = triangle, Left = square, DownRight = cross

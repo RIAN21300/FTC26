@@ -13,8 +13,9 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 */
 
 import org.firstinspires.ftc.teamcode.RobotConfig;
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+
+import java.util.List;
 
 import dev.nextftc.control.ControlSystem;
 import dev.nextftc.control.KineticState;
@@ -107,10 +108,24 @@ public class HoodedShooter implements Subsystem {
             }
         }
 
-        public void trackTag(double delta) {
-            controller.setGoal(new KineticState(delta));
+        public void trackTag() {
+            double delta = 180;
 
-            setRotateSpeed(controller.calculate(new KineticState(0,0)));
+            while (delta >= 5) {
+                List<AprilTagDetection> currentTags = Camera.INSTANCE.getDetectionList();
+                for (AprilTagDetection tag : currentTags) {
+                    if (tag.id == DESIRED_TAG_ID) {
+                        delta = tag.ftcPose.bearing;
+                        break;
+                    }
+                }
+
+                controller.setGoal(new KineticState(delta));
+
+                setRotateSpeed(controller.calculate(new KineticState(0, 0)));
+            }
+
+            setRotateSpeed(0);
         }
 
         public void update() {

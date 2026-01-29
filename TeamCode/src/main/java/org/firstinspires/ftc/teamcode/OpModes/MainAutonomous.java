@@ -12,10 +12,10 @@ package org.firstinspires.ftc.teamcode.OpModes;
  > ^ <  > ^ <  > ^ <  > ^ <
 */
 
-import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.RobotConfig;
 import org.firstinspires.ftc.teamcode.Subsystems.Camera;
@@ -24,16 +24,19 @@ import org.firstinspires.ftc.teamcode.Subsystems.Flicker;
 import org.firstinspires.ftc.teamcode.Subsystems.HoodedShooter;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
+import java.util.List;
+
+import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
+import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
+import dev.nextftc.extensions.pedro.FollowPath;
 import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
-import dev.nextftc.hardware.impl.Direction;
-import dev.nextftc.hardware.impl.IMUEx;
-import dev.nextftc.hardware.impl.MotorEx;
 
 @Autonomous(name = "Main Autonomous OpMode")
 public class MainAutonomous extends NextFTCOpMode {
@@ -55,12 +58,7 @@ public class MainAutonomous extends NextFTCOpMode {
 
     /* VARIABLES */
     // Drivetrain
-    AutoDrivetrain autoDrivetrain = new AutoDrivetrain(hardwareMap);
-    private final MotorEx frontLeftMotor = new MotorEx("left_front").brakeMode();
-    private final MotorEx frontRightMotor = new MotorEx("right_front").brakeMode();
-    private final MotorEx backLeftMotor = new MotorEx("left_back").brakeMode();
-    private final MotorEx backRightMotor = new MotorEx("right_back").brakeMode();
-    private final IMUEx imu = new IMUEx("imu", Direction.UP, Direction.FORWARD).zeroed();
+    AutoDrivetrain autoDrivetrain = new AutoDrivetrain();
     // Info
     AutoInfoManager autoInfoManager;
 
@@ -86,7 +84,10 @@ public class MainAutonomous extends NextFTCOpMode {
 
         HoodedShooter.INSTANCE.turret.updateDesiredTagID(autoInfoManager.currentAlliance);
 
+        autoInfoManager.patternID = Camera.INSTANCE.getDetectionList().get(0).id;
 
+        PedroComponent.follower().setStartingPose(AutoDrivetrain.startPose);
+        pathStage = 0;
     }
 
     @Override
@@ -96,11 +97,44 @@ public class MainAutonomous extends NextFTCOpMode {
 
     @Override
     public void onStartButtonPressed() {
+
     }
 
     @Override
     public void onUpdate() {
+        PedroComponent.follower().update();
+        autonomousPathUpdate();
+    }
 
+    private int pathStage;
+    public void autonomousPathUpdate() {
+        switch (pathStage) {
+            case 0:
+                if (!PedroComponent.follower().isBusy()) {
+                    PedroComponent.follower().followPath(autoInfoManager.pathFirst, true);
+                    pathStage = 1;
+                }
+                break;
+            case 1:
+                if (!PedroComponent.follower().isBusy()) {
+                    HoodedShooter.INSTANCE.turret.trackTag();
+                    HoodedShooter.INSTANCE.shooter.setState(true);
+                    new Delay(100);
+                    Flicker.INSTANCE.autoFlick(autoInfoManager.currentPattern);
+                    HoodedShooter.INSTANCE.shooter.setState(false);
+                    Intake.INSTANCE.run();
+                    PedroComponent.follower().followPath(autoInfoManager.pathSecond, true);
+                    pathStage = 2;
+                }
+                break;
+            case 2:
+                if (!PedroComponent.follower().isBusy()) {
+                    Intake.INSTANCE.rest();
+                    PedroComponent.follower().followPath(autoInfoManager.pathThird, true);
+                    pathStage = 3;
+                }
+                break;
+        }
     }
 }
 
@@ -143,22 +177,30 @@ class AutoInfoManager {
     public void updateStartPosition(boolean StartNearGoal) {
         startNearGoal = StartNearGoal;
     }
+
+    public PathChain pathFirst = PedroComponent.follower().pathBuilder()
+            .addPath(new BezierLine(AutoDrivetrain.startPose, AutoDrivetrain.scorePose))
+            .setLinearHeadingInterpolation(AutoDrivetrain.startPose.getHeading(), AutoDrivetrain.scorePose.getHeading())
+            .build();
+
+    public PathChain pathSecond = PedroComponent.follower().pathBuilder()
+            .addPath(new BezierLine(AutoDrivetrain.scorePose, AutoDrivetrain.spikeMark_LoadingZone))
+            .setLinearHeadingInterpolation(AutoDrivetrain.scorePose.getHeading(), AutoDrivetrain.spikeMark_LoadingZone.getHeading())
+            .build();
+
+    public PathChain pathThird = PedroComponent.follower().pathBuilder()
+            .addPath(new BezierLine(AutoDrivetrain.spikeMark_LoadingZone, AutoDrivetrain.scorePose))
+            .setLinearHeadingInterpolation(AutoDrivetrain.spikeMark_LoadingZone.getHeading(), AutoDrivetrain.scorePose.getHeading())
+            .build();
 }
 
 class AutoDrivetrain { // Using PedroPathing
-    public AutoDrivetrain(HardwareMap hardwareMap) {
-        follower = Constants.createFollower(hardwareMap);
-    }
-
-    /* Follower */
-    private final Follower follower;
-
     /* Pose on Zone */
-    private Pose start;
-    private Pose score;
-    private Pose spikeMark_Goal;
-    private Pose spikeMark_Middle;
-    private Pose spikeMark_LoadingZone;
+    public static Pose startPose;
+    public static Pose scorePose;
+    public static Pose spikeMark_Goal;
+    public static Pose spikeMark_Middle;
+    public static Pose spikeMark_LoadingZone;
     private double MirrorX(boolean mirrored, double x) { // Mirror Pose for Red Alliance
         return (mirrored ? 144.0 - x : x);
     }
@@ -170,39 +212,39 @@ class AutoDrivetrain { // Using PedroPathing
     public void updatePose(RobotConfig.AllianceName Alliance, boolean startNearGoal) {
         boolean mirrored = Alliance.equals(RobotConfig.AllianceName.Red);
 
-        start = (
+        startPose = (
                 startNearGoal
                         ? new Pose(
-                                MirrorX(mirrored, 21),
-                                123,
-                                Math.toRadians(MirrorAngle(mirrored, -35))
-                        )
-                        : new Pose(
-                                MirrorX(mirrored, 56),
-                                8,
-                                Math.toRadians(MirrorAngle(mirrored, 90))
-                        )
-        );
-        score = (
-                startNearGoal
-                        ? new Pose(
-                                72,
-                                72,
-                                Math.toRadians(MirrorAngle(mirrored, 135))
+                        MirrorX(mirrored, 21),
+                        123,
+                        Math.toRadians(MirrorAngle(mirrored, -35))
                 )
                         : new Pose(
-                                MirrorX(mirrored, 56),
-                                8,
-                                Math.toRadians(MirrorAngle(mirrored, 121))
+                        MirrorX(mirrored, 56),
+                        8,
+                        Math.toRadians(MirrorAngle(mirrored, 90))
+                )
+        );
+        scorePose = (
+                startNearGoal
+                        ? new Pose(
+                        72,
+                        72,
+                        Math.toRadians(MirrorAngle(mirrored, 135))
+                )
+                        : new Pose(
+                        MirrorX(mirrored, 56),
+                        8,
+                        Math.toRadians(MirrorAngle(mirrored, 121))
                 )
         );
 
-        spikeMark_Goal        = new Pose(
+        spikeMark_Goal = new Pose(
                 MirrorX(mirrored, 48),
                 84,
                 Math.toRadians(MirrorAngle(mirrored, 180))
         );
-        spikeMark_Middle      = new Pose(
+        spikeMark_Middle = new Pose(
                 MirrorX(mirrored, 48),
                 60,
                 Math.toRadians(MirrorAngle(mirrored, 180))

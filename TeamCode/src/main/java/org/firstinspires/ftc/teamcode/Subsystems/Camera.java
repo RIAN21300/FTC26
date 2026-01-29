@@ -20,12 +20,13 @@ public class Camera implements Subsystem {
     public void initCamera(HardwareMap hardwareMap) {
         aprilTag = new AprilTagProcessor.Builder()
                 .build();
-        aprilTag.setDecimation(3);
+        aprilTag.setDecimation(2);
 
         visionPortal = new VisionPortal.Builder()
                 .setCamera(hardwareMap.get(WebcamName.class, RobotConfig.WEBCAM))
                 .addProcessor(aprilTag)
                 .setCameraResolution(new Size(640, 480))
+                .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
                 .build();
     }
 

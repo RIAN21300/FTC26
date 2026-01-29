@@ -34,6 +34,7 @@ public class ColorCamera implements Subsystem {
                     .addProcessor(colorLocator[i])
                     .setCameraResolution(new Size(640, 480))
                     .setCamera(hardwareMap.get(WebcamName.class, RobotConfig.COLOR_WEBCAM))
+                    .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
                     .build();
         }
     }
