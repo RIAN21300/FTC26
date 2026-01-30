@@ -79,16 +79,17 @@ public class HoodedShooter implements Subsystem {
             rotateSpeed = 0.0;
 
             controller = ControlSystem.builder()
-                    .posPid(0.05, 0, 0.0001)                //TODO: tune these parameters
+                    .posPid(0.02, 0, 0.0001)
                     .build();
         }
 
         // Variables
         public int DESIRED_TAG_ID;
         private final CRServoEx rotate = new CRServoEx(RobotConfig.SERVO_TURRET_ROTATE); // Rotating servo
-        public double rotateSpeed;
-
-        private ControlSystem controller;
+        private double rotateSpeed;
+        public double delta = 0;
+        private final ControlSystem controller;
+        public boolean isTrackMode = false;
 
         // API
         public void setRotateSpeed(double newSpeed) {
@@ -109,26 +110,24 @@ public class HoodedShooter implements Subsystem {
         }
 
         public void trackTag() {
-            double delta = 180;
-
-            while (delta >= 5) {
-                List<AprilTagDetection> currentTags = Camera.INSTANCE.getDetectionList();
-                for (AprilTagDetection tag : currentTags) {
-                    if (tag.id == DESIRED_TAG_ID) {
-                        delta = tag.ftcPose.bearing;
-                        break;
-                    }
+            List<AprilTagDetection> currentTags = Camera.INSTANCE.getDetectionList();
+            for (AprilTagDetection tag : currentTags) {
+                if (tag.id == DESIRED_TAG_ID) {
+                    delta = tag.ftcPose.bearing;
+                    return;
                 }
-
-                controller.setGoal(new KineticState(delta));
-
-                setRotateSpeed(controller.calculate(new KineticState(0, 0)));
             }
 
-            setRotateSpeed(0);
+            delta = 0;
         }
 
-        public void update() {
+        public void trackMode() {
+            trackTag();
+            controller.setGoal(new KineticState(delta));
+            rotate.setPower(controller.calculate(new KineticState(0)));
+        }
+
+        public void manualMode() {
             rotate.setPower(rotateSpeed);
         }
     }
@@ -145,7 +144,6 @@ public class HoodedShooter implements Subsystem {
     @Override
     public void periodic() {
         shooter.update();
-        turret.update();
     }
 
     /* API */

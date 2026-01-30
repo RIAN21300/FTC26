@@ -13,9 +13,10 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 */
 
 
+import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.teamcode.RobotConfig;
 
-import dev.nextftc.core.commands.delays.Delay;
 import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.hardware.impl.ServoEx;
 
@@ -33,10 +34,14 @@ public class Flicker implements Subsystem {
         }
 
         // Variables
-        private double LIFT_POS = 8.0/9.0;
-        private double REST_POS = 1.0/9.0;
+        private double LIFT_POS = 7.9/9.0;
+        private double REST_POS = 1.1/9.0;
         private final ServoEx servo;
-        private static boolean busy;
+        private boolean armState = false;
+        private final ElapsedTime timer = new ElapsedTime();
+        // static
+        private static final double LIFT_DURATION = 1000.0; // ms
+        public static boolean busy = false;
 
         // API
         public double getPos() {
@@ -44,13 +49,9 @@ public class Flicker implements Subsystem {
         }
 
         public void run() {
-            Arm.busy = true;
-            lift();
-
-            new Delay(1.0);
-
-            rest();
-            Arm.busy = false;
+            busy = true;
+            timer.reset();
+            armState = true;
         }
 
         public void lift() {
@@ -64,6 +65,16 @@ public class Flicker implements Subsystem {
         public void reverse() {
             LIFT_POS = 1.0/9.0;        // Reversed Arm position
             REST_POS = 8.0/9.0;
+        }
+
+        public void update() {
+            if (armState && timer.milliseconds() <= LIFT_DURATION) {
+                lift();
+            } else {
+                armState = false;
+                rest();
+                busy = false;
+            }
         }
 
         public void autoFlickMotif(String pattern) {
@@ -95,16 +106,33 @@ public class Flicker implements Subsystem {
     /* SUBSYSTEM FUNCTIONS */
     @Override
     public void initialize() {
-        Arm.busy = false;
-
         for (int i = 0; i < armCount; ++i) {
             arms[i] = new Arm(RobotConfig.SERVO_FLICKER[i]);
         }
 
-        arms[2].reverse();
+        arms[RobotConfig.BallSlotName.DownRight.ordinal()].reverse();
+
+        for (int i = 0; i < armCount; ++i) {
+            arms[i].rest();
+        }
+    }
+
+    @Override
+    public void periodic() {
+        for (int i = 0; i < armCount; ++i) {
+            arms[i].update();
+        }
     }
 
     /* API */
+    public void liftArm(RobotConfig.BallSlotName armName) {
+        arms[armName.ordinal()].lift();
+    }
+
+    public void restArm(RobotConfig.BallSlotName armName) {
+        arms[armName.ordinal()].rest();
+    }
+
     public void runArm(RobotConfig.BallSlotName armName) {
         if (!Arm.busy) {
             arms[armName.ordinal()].run();
@@ -117,7 +145,7 @@ public class Flicker implements Subsystem {
 
     public void autoFlick(String pattern) {
         int greenPos = 0;
-        boolean flicked[] = {false, false, false};
+        boolean[] flicked = {false, false, false};
 
         for (RobotConfig.BallSlotName slotName : RobotConfig.BallSlotName.values()) {
             if (ColorCamera.INSTANCE.checkSlotForGreen(slotName)) {

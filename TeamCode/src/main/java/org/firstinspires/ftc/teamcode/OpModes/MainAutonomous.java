@@ -214,12 +214,12 @@ class AutoDrivetrain { // Using PedroPathing
 
         startPose = (
                 startNearGoal
-                        ? new Pose(
+                ? new Pose(
                         MirrorX(mirrored, 21),
                         123,
                         Math.toRadians(MirrorAngle(mirrored, -35))
                 )
-                        : new Pose(
+                : new Pose(
                         MirrorX(mirrored, 56),
                         8,
                         Math.toRadians(MirrorAngle(mirrored, 90))
@@ -227,12 +227,12 @@ class AutoDrivetrain { // Using PedroPathing
         );
         scorePose = (
                 startNearGoal
-                        ? new Pose(
+                ? new Pose(
                         72,
                         72,
                         Math.toRadians(MirrorAngle(mirrored, 135))
                 )
-                        : new Pose(
+                : new Pose(
                         MirrorX(mirrored, 56),
                         8,
                         Math.toRadians(MirrorAngle(mirrored, 121))
