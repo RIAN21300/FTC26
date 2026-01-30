@@ -13,8 +13,9 @@ package org.firstinspires.ftc.teamcode.Subsystems;
 */
 
 import org.firstinspires.ftc.teamcode.RobotConfig;
-import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+
+import java.util.List;
 
 import dev.nextftc.control.ControlSystem;
 import dev.nextftc.control.KineticState;
@@ -87,7 +88,7 @@ public class HoodedShooter implements Subsystem {
         private final CRServoEx rotate = new CRServoEx(RobotConfig.SERVO_TURRET_ROTATE); // Rotating servo
         public double rotateSpeed;
 
-        private ControlSystem controller;
+        private final ControlSystem controller;
 
         // API
         public void setRotateSpeed(double newSpeed) {
@@ -107,10 +108,18 @@ public class HoodedShooter implements Subsystem {
             }
         }
 
-        public void trackTag(double delta) {
-            controller.setGoal(new KineticState(delta));
+        public boolean aimToTag() {
+            List<AprilTagDetection> detectionList = Camera.INSTANCE.getDetectionList();
 
-            setRotateSpeed(controller.calculate(new KineticState(0,0)));
+            for (AprilTagDetection detection : detectionList) {
+                if (detection.id == DESIRED_TAG_ID) {
+                    controller.setGoal(new KineticState(detection.ftcPose.bearing));
+                    setRotateSpeed(controller.calculate(new KineticState(0,0)));
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public void update() {

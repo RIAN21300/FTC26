@@ -37,7 +37,7 @@ public class Flicker implements Subsystem {
         private double REST_POS = 1.0/9.0;
         private final ServoEx servo;
         private boolean state;
-        private static boolean busy;
+        private static final double LIFT_DURATION = 1.0;
 
         // API
         public double getPos() {
@@ -45,13 +45,11 @@ public class Flicker implements Subsystem {
         }
 
         public void run() {
-            Arm.busy = true;
             lift();
 
-            new Delay(1.0);
+            new Delay(LIFT_DURATION);
 
             rest();
-            Arm.busy = false;
         }
 
         public void lift() {
@@ -96,8 +94,6 @@ public class Flicker implements Subsystem {
     /* SUBSYSTEM FUNCTIONS */
     @Override
     public void initialize() {
-        Arm.busy = false;
-
         for (int i = 0; i < armCount; ++i) {
             arms[i] = new Arm(RobotConfig.SERVO_FLICKER[i]);
         }
@@ -107,9 +103,7 @@ public class Flicker implements Subsystem {
 
     /* API */
     public void runArm(RobotConfig.BallSlotName armName) {
-        if (!Arm.busy) {
-            arms[armName.ordinal()].run();
-        }
+        arms[armName.ordinal()].run();
     }
 
     public double getArmPos(RobotConfig.BallSlotName armName) {

@@ -14,6 +14,7 @@ package org.firstinspires.ftc.teamcode.OpModes;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.Path;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -159,14 +160,17 @@ class AutoDrivetrain { // Using PedroPathing
     private Pose spikeMark_Goal;
     private Pose spikeMark_Middle;
     private Pose spikeMark_LoadingZone;
+
+    /* Path */
+    private Path path;
+
+    /* API */
     private double MirrorX(boolean mirrored, double x) { // Mirror Pose for Red Alliance
         return (mirrored ? 144.0 - x : x);
     }
     private double MirrorAngle(boolean mirrored, double angle) {
         return (mirrored ? 180.0 - angle : angle);
     }
-
-    /* API */
     public void updatePose(RobotConfig.AllianceName Alliance, boolean startNearGoal) {
         boolean mirrored = Alliance.equals(RobotConfig.AllianceName.Red);
 

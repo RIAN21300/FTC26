@@ -28,9 +28,6 @@ import org.firstinspires.ftc.teamcode.Subsystems.Flicker;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.Subsystems.HoodedShooter;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-
-import java.util.List;
 
 import dev.nextftc.ftc.Gamepads;
 import dev.nextftc.ftc.NextFTCOpMode;
@@ -51,8 +48,8 @@ public class MainTeleOp extends NextFTCOpMode {
                 new SubsystemComponent(
                         HoodedShooter.INSTANCE,
                         Intake.INSTANCE,
-                        Flicker.INSTANCE
-//                        Camera.INSTANCE
+                        Flicker.INSTANCE,
+                        Camera.INSTANCE
                 )
         );
     }
@@ -71,7 +68,7 @@ public class MainTeleOp extends NextFTCOpMode {
     public void onInit() {
         currentAlliance = RobotConfig.AllianceName.Blue; // Default Alliance
 
-//        Camera.INSTANCE.initCamera(hardwareMap);
+        Camera.INSTANCE.initCamera(hardwareMap);
     }
 
     @Override
@@ -113,6 +110,21 @@ public class MainTeleOp extends NextFTCOpMode {
                 .toggleOnBecomesTrue()
                 .whenTrue (Intake.INSTANCE::run)
                 .whenFalse(Intake.INSTANCE::rest);
+
+        // FLICKER
+        // TOGGLE CYCLE: UpRight = triangle, Left = square, DownRight = cross
+
+        button(() -> gamepad2.triangle)
+                .whenBecomesTrue(() -> Flicker.INSTANCE.runArm(RobotConfig.BallSlotName.UpRight));
+        button(() -> gamepad2.square)
+                .whenBecomesTrue(() -> Flicker.INSTANCE.runArm(RobotConfig.BallSlotName.Left));
+        button(() -> gamepad2.cross)
+                .whenBecomesTrue(() -> Flicker.INSTANCE.runArm(RobotConfig.BallSlotName.DownRight));
+
+        // TURRET: Rotate
+        // TOGGLE AutoAim
+        button(() -> gamepad2.circle)
+                .whenBecomesTrue(() -> HoodedShooter.INSTANCE.turret.aimToTag());
     }
 
     @Override
@@ -124,27 +136,8 @@ public class MainTeleOp extends NextFTCOpMode {
         HoodedShooter.INSTANCE.setShooterState(gamepad2.left_bumper);
 
         // TURRET
-        // ANALOG: gamepad2 left stick x
+        // Rotate: ANALOG: gamepad2 left stick x
         HoodedShooter.INSTANCE.setTurretRotateSpeed(-gamepad2.left_stick_x);
-
-        if (true) { //TODO: add binding to this part (or cleanup)
-            List<AprilTagDetection> currentTags = Camera.INSTANCE.getDetectionList();
-            for (AprilTagDetection tag : currentTags) {
-                if (tag.id == HoodedShooter.INSTANCE.turret.DESIRED_TAG_ID) {
-                    HoodedShooter.INSTANCE.turret.trackTag(tag.ftcPose.bearing);
-                    break;
-                }
-            }
-        }
-
-        // FLICKER
-        // PUSH: UpRight = triangle, Left = square, DownRight = cross
-        button(() -> gamepad2.triangle)
-                .whenBecomesTrue(() -> Flicker.INSTANCE.runArm(RobotConfig.BallSlotName.UpRight));
-        button(() -> gamepad2.square)
-                .whenBecomesTrue(() -> Flicker.INSTANCE.runArm(RobotConfig.BallSlotName.Left));
-        button(() -> gamepad2.cross)
-                .whenBecomesTrue(() -> Flicker.INSTANCE.runArm(RobotConfig.BallSlotName.DownRight));
 
         // DEBUG
         telemetry.addLine("\n====# GAMEPAD1 JOYSTICK #====")
