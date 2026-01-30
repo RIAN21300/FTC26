@@ -16,13 +16,13 @@ public class Constants {
         public static final double ODOMETRY_POD_DIAMETER = 35; //MM
         public static double encoderResolution = 8192 / (Math.PI * ODOMETRY_POD_DIAMETER);
         public static FollowerConstants followerConstants = new FollowerConstants()
-                .mass(5)                                        //TODO: Calculate this later
-                .useSecondaryTranslationalPIDF(true)
-                .useSecondaryHeadingPIDF(true)
-                .useSecondaryDrivePIDF(true);
+                .mass(5)    //KG                                    //TODO: Calculate this later
+                .useSecondaryTranslationalPIDF(false)
+                .useSecondaryHeadingPIDF(false)
+                .useSecondaryDrivePIDF(false);
 
         public static MecanumConstants driveConstants = new MecanumConstants()
-                .maxPower(1)
+                .maxPower(0.8)
                 .rightFrontMotorName("right_front")
                 .rightRearMotorName("right_back")
                 .leftRearMotorName("left_back")
@@ -34,8 +34,8 @@ public class Constants {
         public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 1, 1);
 
         public static PinpointConstants localizerConstants = new PinpointConstants() //TODO: check this later
-                .forwardPodY(-5)
-                .strafePodX(0.5)
+                .forwardPodY(-5) //INCH
+                .strafePodX(0.5) //INCH
                 .distanceUnit(DistanceUnit.INCH)
                 .hardwareMapName("pinpoint")
                 .customEncoderResolution(encoderResolution)

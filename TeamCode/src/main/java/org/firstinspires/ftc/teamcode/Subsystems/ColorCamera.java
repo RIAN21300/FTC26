@@ -34,6 +34,7 @@ public class ColorCamera implements Subsystem {
                     .addProcessor(colorLocator[i])
                     .setCameraResolution(new Size(640, 480))
                     .setCamera(hardwareMap.get(WebcamName.class, RobotConfig.COLOR_WEBCAM))
+                    .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
                     .build();
         }
     }
@@ -78,6 +79,7 @@ public class ColorCamera implements Subsystem {
     }
 
     public boolean checkSlotForPurple(RobotConfig.BallSlotName slotName) {
+        updateBlobList();
         for(ColorBlobLocatorProcessor.Blob blob : purpleBlobList)
         {
             RotatedRect boxFit = blob.getBoxFit();
@@ -91,6 +93,7 @@ public class ColorCamera implements Subsystem {
     }
 
     public boolean checkSlotForGreen(RobotConfig.BallSlotName slotName) {
+        updateBlobList();
         for(ColorBlobLocatorProcessor.Blob blob : greenBlobList)
         {
             RotatedRect boxFit = blob.getBoxFit();

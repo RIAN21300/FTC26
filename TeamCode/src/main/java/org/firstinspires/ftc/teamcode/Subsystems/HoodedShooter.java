@@ -88,7 +88,7 @@ public class HoodedShooter implements Subsystem {
         private final CRServoEx rotate = new CRServoEx(RobotConfig.SERVO_TURRET_ROTATE); // Rotating servo
         public double rotateSpeed;
 
-        private final ControlSystem controller;
+        private ControlSystem controller;
 
         // API
         public void setRotateSpeed(double newSpeed) {
@@ -108,18 +108,24 @@ public class HoodedShooter implements Subsystem {
             }
         }
 
-        public boolean aimToTag() {
-            List<AprilTagDetection> detectionList = Camera.INSTANCE.getDetectionList();
+        public void trackTag() {
+            double delta = 180;
 
-            for (AprilTagDetection detection : detectionList) {
-                if (detection.id == DESIRED_TAG_ID) {
-                    controller.setGoal(new KineticState(detection.ftcPose.bearing));
-                    setRotateSpeed(controller.calculate(new KineticState(0,0)));
-                    return true;
+            while (delta >= 5) {
+                List<AprilTagDetection> currentTags = Camera.INSTANCE.getDetectionList();
+                for (AprilTagDetection tag : currentTags) {
+                    if (tag.id == DESIRED_TAG_ID) {
+                        delta = tag.ftcPose.bearing;
+                        break;
+                    }
                 }
+
+                controller.setGoal(new KineticState(delta));
+
+                setRotateSpeed(controller.calculate(new KineticState(0, 0)));
             }
 
-            return false;
+            setRotateSpeed(0);
         }
 
         public void update() {

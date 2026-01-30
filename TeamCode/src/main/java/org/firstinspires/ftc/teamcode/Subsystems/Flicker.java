@@ -36,8 +36,7 @@ public class Flicker implements Subsystem {
         private double LIFT_POS = 8.0/9.0;
         private double REST_POS = 1.0/9.0;
         private final ServoEx servo;
-        private boolean state;
-        private static final double LIFT_DURATION = 1.0;
+        private static boolean busy;
 
         // API
         public double getPos() {
@@ -45,11 +44,13 @@ public class Flicker implements Subsystem {
         }
 
         public void run() {
+            Arm.busy = true;
             lift();
 
-            new Delay(LIFT_DURATION);
+            new Delay(1.0);
 
             rest();
+            Arm.busy = false;
         }
 
         public void lift() {
@@ -94,6 +95,8 @@ public class Flicker implements Subsystem {
     /* SUBSYSTEM FUNCTIONS */
     @Override
     public void initialize() {
+        Arm.busy = false;
+
         for (int i = 0; i < armCount; ++i) {
             arms[i] = new Arm(RobotConfig.SERVO_FLICKER[i]);
         }
@@ -103,10 +106,40 @@ public class Flicker implements Subsystem {
 
     /* API */
     public void runArm(RobotConfig.BallSlotName armName) {
-        arms[armName.ordinal()].run();
+        if (!Arm.busy) {
+            arms[armName.ordinal()].run();
+        }
     }
 
     public double getArmPos(RobotConfig.BallSlotName armName) {
         return arms[armName.ordinal()].getPos();
+    }
+
+    public void autoFlick(String pattern) {
+        int greenPos = 0;
+        boolean flicked[] = {false, false, false};
+
+        for (RobotConfig.BallSlotName slotName : RobotConfig.BallSlotName.values()) {
+            if (ColorCamera.INSTANCE.checkSlotForGreen(slotName)) {
+                greenPos = slotName.ordinal();
+                break;
+            }
+        }
+
+        for (int i = 0; i < armCount; i++) {
+            if (pattern.charAt(i) == 'G') {
+                arms[greenPos].run();
+                flicked[greenPos] = true;
+            }
+            else {
+                for (int j = 0; j < armCount; j++) {
+                    if (!flicked[j] && j != greenPos) {
+                        arms[j].run();
+                        flicked[j] = true;
+                        break;
+                    }
+                }
+            }
+        }
     }
 }
