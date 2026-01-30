@@ -79,6 +79,7 @@ public class ColorCamera implements Subsystem {
     }
 
     public boolean checkSlotForPurple(RobotConfig.BallSlotName slotName) {
+        updateBlobList();
         for(ColorBlobLocatorProcessor.Blob blob : purpleBlobList)
         {
             RotatedRect boxFit = blob.getBoxFit();
@@ -92,6 +93,7 @@ public class ColorCamera implements Subsystem {
     }
 
     public boolean checkSlotForGreen(RobotConfig.BallSlotName slotName) {
+        updateBlobList();
         for(ColorBlobLocatorProcessor.Blob blob : greenBlobList)
         {
             RotatedRect boxFit = blob.getBoxFit();

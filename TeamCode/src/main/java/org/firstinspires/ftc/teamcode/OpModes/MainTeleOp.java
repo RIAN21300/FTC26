@@ -127,7 +127,7 @@ public class MainTeleOp extends NextFTCOpMode {
         // ANALOG: gamepad2 left stick x
         HoodedShooter.INSTANCE.setTurretRotateSpeed(-gamepad2.left_stick_x);
 
-        HoodedShooter.INSTANCE.turret.trackTag(); //TODO: Binding
+        if (gamepad2.right_bumper) HoodedShooter.INSTANCE.turret.trackTag();
 
         // FLICKER
         // PUSH: UpRight = triangle, Left = square, DownRight = cross
