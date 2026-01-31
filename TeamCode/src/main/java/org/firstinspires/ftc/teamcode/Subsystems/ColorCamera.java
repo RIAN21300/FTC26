@@ -41,7 +41,7 @@ public class ColorCamera implements Subsystem {
 
     /* VARIABLES */
     private final Point[] ballPosition = {
-            new Point(0,0),            //Average estimate position
+            new Point(0,0),                    //Average estimate position
             new Point(0,0),
             new Point(0,0)
     };                                             //TODO: tune this later to align with ball position on floor

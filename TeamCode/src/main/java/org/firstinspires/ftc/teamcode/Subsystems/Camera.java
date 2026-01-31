@@ -45,4 +45,14 @@ public class Camera implements Subsystem {
     public List<AprilTagDetection> getDetectionList() {
         return aprilTag.getDetections();
     }
+
+    public double delta() {
+        List<AprilTagDetection> currentDetection = getDetectionList();
+        for (AprilTagDetection tag : currentDetection) {
+            if (tag.id == HoodedShooter.INSTANCE.turret.DESIRED_TAG_ID) {
+                return tag.ftcPose.bearing;
+            }
+        }
+        return 0;
+    }
 }

@@ -38,7 +38,9 @@ public class HoodedShooter implements Subsystem {
         // Variables
         public boolean state;
         public final MotorEx motor = new MotorEx(RobotConfig.MOTOR_SHOOTER);
-        public static final double percentage = 0.6125;
+        public static final double percentage = 0.36
+
+                ;
         public static final double maxVelocity = 1800.0;
 
         // PID Controller

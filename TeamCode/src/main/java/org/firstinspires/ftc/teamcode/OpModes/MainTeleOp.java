@@ -32,6 +32,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import dev.nextftc.ftc.Gamepads;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
+import dev.nextftc.hardware.driving.FieldCentric;
 import dev.nextftc.hardware.driving.MecanumDriverControlled;
 import dev.nextftc.hardware.impl.Direction;
 import dev.nextftc.hardware.impl.IMUEx;
@@ -57,9 +58,9 @@ public class MainTeleOp extends NextFTCOpMode {
     /* VARIABLES */
     private RobotConfig.AllianceName currentAlliance;
     // Drivetrain
-    private final MotorEx frontLeftMotor = new MotorEx("left_front").brakeMode().reversed();
+    private final MotorEx frontLeftMotor = new MotorEx("left_front").brakeMode();
     private final MotorEx frontRightMotor = new MotorEx("right_front").brakeMode();
-    private final MotorEx backLeftMotor = new MotorEx("left_back").brakeMode().reversed();
+    private final MotorEx backLeftMotor = new MotorEx("left_back").brakeMode();
     private final MotorEx backRightMotor = new MotorEx("right_back").brakeMode();
     private final IMUEx imu = new IMUEx("imu", Direction.UP, Direction.FORWARD).zeroed();
 
@@ -100,7 +101,7 @@ public class MainTeleOp extends NextFTCOpMode {
                 Gamepads.gamepad1().leftStickY().negate(),
                 Gamepads.gamepad1().leftStickX(),
                 Gamepads.gamepad1().rightStickX()
-//                new FieldCentric(imu)
+                //new FieldCentric(imu)
         );
         driverControlled.schedule();
 
@@ -121,19 +122,18 @@ public class MainTeleOp extends NextFTCOpMode {
                 .whenBecomesTrue (() -> Flicker.INSTANCE.runArm(RobotConfig.BallSlotName.DownRight));
 
         // TURRET TAG TRACKER
-        button(() -> gamepad2.circle)
-                .toggleOnBecomesTrue()
-                .whenTrue (HoodedShooter.INSTANCE.turret::trackMode)
-                .whenFalse(HoodedShooter.INSTANCE.turret::manualMode);
+        //button(() -> gamepad2.circle)
+        //        .whenBecomesTrue(this::track);
     }
 
     @Override
     public void onUpdate() {
+        PedroComponent.follower().update();
         BindingManager.update();
 
         // SHOOTER
         // PUSH: Shooter state (ON/OFF) equals to gamepad2 left_bumper state
-        HoodedShooter.INSTANCE.setShooterState(gamepad2.left_bumper);
+        if (gamepad2.left_bumper) HoodedShooter.INSTANCE.setShooterState(true);
 
         // TURRET
         // ANALOG: gamepad2 left stick x
@@ -156,11 +156,7 @@ public class MainTeleOp extends NextFTCOpMode {
                 .addData("\npercentage reached"             , HoodedShooter.INSTANCE.shooter.getCurrentPercentage());
 
         telemetry.addLine("\n====# Turret #====")
-                .addData("\ngamepad2.left_stick_x"          , gamepad2.left_stick_x)
-                .addData("\ngamepad2.circle"                , gamepad2.circle)
-                .addData("\ndelta"                          , HoodedShooter.INSTANCE.turret.delta)
-                .addData("\nTrackMode", HoodedShooter.INSTANCE.turret.isTrackMode)
-                .addData("\nServoTurretRotate speed"        , HoodedShooter.INSTANCE.turret.getRotateSpeed());
+                .addData("\nDelta"        , Camera.INSTANCE.delta());
 
         telemetry.addLine("\n====# INTAKE #====")
                 .addData("\ngamepad2.right_bumper"          , gamepad2.right_bumper)
@@ -184,5 +180,9 @@ public class MainTeleOp extends NextFTCOpMode {
         HoodedShooter.INSTANCE.setShooterState(false);
 
         Intake.INSTANCE.rest();
+    }
+
+    public void track() {
+        PedroComponent.follower().turn(Math.toRadians(Camera.INSTANCE.delta()), false);
     }
 }

@@ -40,7 +40,7 @@ public class Flicker implements Subsystem {
         private boolean armState = false;
         private final ElapsedTime timer = new ElapsedTime();
         // static
-        private static final double LIFT_DURATION = 1000.0; // ms
+        private static final double LIFT_DURATION = 600; // ms
         public static boolean busy = false;
 
         // API
@@ -79,7 +79,6 @@ public class Flicker implements Subsystem {
 
         public void autoFlickMotif(String pattern) {
             for (int i = 0; i < pattern.length(); ++i) {
-
                 if (pattern.charAt(i) == 'G') {
                     for (RobotConfig.BallSlotName slotName : RobotConfig.BallSlotName.values()) {
                         if (ColorCamera.INSTANCE.checkSlotForGreen(slotName)) {
