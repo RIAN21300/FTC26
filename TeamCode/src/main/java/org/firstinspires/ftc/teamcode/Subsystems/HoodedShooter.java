@@ -38,10 +38,10 @@ public class HoodedShooter implements Subsystem {
         // Variables
         public boolean state;
         public final MotorEx motor = new MotorEx(RobotConfig.MOTOR_SHOOTER);
-        public static final double percentage = 0.36
-
-                ;
+        public static final double LOW_percentage = 0.6;
+        public static final double HIGH_percentage = 0.9;
         public static final double maxVelocity = 1800.0;
+        public boolean FarMode = false;
 
         // PID Controller
         private static final ControlSystem controller = ControlSystem.builder()
@@ -52,7 +52,7 @@ public class HoodedShooter implements Subsystem {
         public void update() {
             if (state) {
                 // outVelocity = maxVelocity * percentage
-                controller.setGoal(new KineticState(0.0, maxVelocity * percentage));
+                controller.setGoal(new KineticState(0.0, maxVelocity * (FarMode ? HIGH_percentage : LOW_percentage)));
                 motor.setPower(controller.calculate(new KineticState(motor.getCurrentPosition(), motor.getVelocity())));
             }
             else {
@@ -146,14 +146,5 @@ public class HoodedShooter implements Subsystem {
     @Override
     public void periodic() {
         shooter.update();
-    }
-
-    /* API */
-    public void setShooterState(boolean newState) {
-        shooter.setState(newState);
-    }
-
-    public void setTurretRotateSpeed(double speed) {
-        turret.setRotateSpeed(speed);
     }
 }

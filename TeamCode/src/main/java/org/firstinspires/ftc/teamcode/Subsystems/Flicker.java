@@ -40,7 +40,7 @@ public class Flicker implements Subsystem {
         private boolean armState = false;
         private final ElapsedTime timer = new ElapsedTime();
         // static
-        private static final double LIFT_DURATION = 600; // ms
+        public static final double LIFT_DURATION = 600; // ms
         public static boolean busy = false;
 
         // API
@@ -74,28 +74,6 @@ public class Flicker implements Subsystem {
                 armState = false;
                 rest();
                 busy = false;
-            }
-        }
-
-        public void autoFlickMotif(String pattern) {
-            for (int i = 0; i < pattern.length(); ++i) {
-                if (pattern.charAt(i) == 'G') {
-                    for (RobotConfig.BallSlotName slotName : RobotConfig.BallSlotName.values()) {
-                        if (ColorCamera.INSTANCE.checkSlotForGreen(slotName)) {
-                            run();
-                            break;
-                        }
-                    }
-                }
-
-                if (pattern.charAt(i) == 'P') {
-                    for (RobotConfig.BallSlotName slotName : RobotConfig.BallSlotName.values()) {
-                        if (ColorCamera.INSTANCE.checkSlotForPurple(slotName)) {
-                            run();
-                            break;
-                        }
-                    }
-                }
             }
         }
     }
@@ -142,27 +120,21 @@ public class Flicker implements Subsystem {
         return arms[armName.ordinal()].getPos();
     }
 
-    public void autoFlick(String pattern) {
-        int greenPos = 0;
-        boolean[] flicked = {false, false, false};
-
-        for (RobotConfig.BallSlotName slotName : RobotConfig.BallSlotName.values()) {
-            if (ColorCamera.INSTANCE.checkSlotForGreen(slotName)) {
-                greenPos = slotName.ordinal();
-                break;
-            }
-        }
-
-        for (int i = 0; i < armCount; i++) {
+    public void autoFlickMotif(String pattern) {
+        for (int i = 0; i < pattern.length(); ++i) {
             if (pattern.charAt(i) == 'G') {
-                arms[greenPos].run();
-                flicked[greenPos] = true;
+                for (RobotConfig.BallSlotName slotName : RobotConfig.BallSlotName.values()) {
+                    if (ColorCamera.INSTANCE.checkSlotForGreen(slotName)) {
+                        runArm(slotName);
+                        break;
+                    }
+                }
             }
-            else {
-                for (int j = 0; j < armCount; j++) {
-                    if (!flicked[j] && j != greenPos) {
-                        arms[j].run();
-                        flicked[j] = true;
+
+            if (pattern.charAt(i) == 'P') {
+                for (RobotConfig.BallSlotName slotName : RobotConfig.BallSlotName.values()) {
+                    if (ColorCamera.INSTANCE.checkSlotForPurple(slotName)) {
+                        runArm(slotName);
                         break;
                     }
                 }

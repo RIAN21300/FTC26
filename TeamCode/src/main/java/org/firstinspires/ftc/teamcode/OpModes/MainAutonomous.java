@@ -14,7 +14,6 @@ package org.firstinspires.ftc.teamcode.OpModes;
 
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
-import com.pedropathing.paths.Path;
 import com.pedropathing.paths.PathChain;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
@@ -25,16 +24,10 @@ import org.firstinspires.ftc.teamcode.Subsystems.Flicker;
 import org.firstinspires.ftc.teamcode.Subsystems.HoodedShooter;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 
-import java.util.List;
-
-import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
-import dev.nextftc.core.commands.groups.SequentialGroup;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
-import dev.nextftc.extensions.pedro.FollowPath;
 import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
@@ -122,7 +115,7 @@ public class MainAutonomous extends NextFTCOpMode {
                     autoDrivetrain.track();
                     HoodedShooter.INSTANCE.shooter.setState(true);
                     new Delay(100);
-                    Flicker.INSTANCE.autoFlick(autoInfoManager.currentPattern);
+                    Flicker.INSTANCE.autoFlickMotif(autoInfoManager.currentPattern);
                     HoodedShooter.INSTANCE.shooter.setState(false);
                     PedroComponent.follower().followPath(autoInfoManager.pathSecond, true);
                     pathStage = 2;
@@ -147,7 +140,7 @@ public class MainAutonomous extends NextFTCOpMode {
                     autoDrivetrain.track();
                     HoodedShooter.INSTANCE.shooter.setState(true);
                     new Delay(100);
-                    Flicker.INSTANCE.autoFlick(autoInfoManager.currentPattern);
+                    Flicker.INSTANCE.autoFlickMotif(autoInfoManager.currentPattern);
                     HoodedShooter.INSTANCE.shooter.setState(false);
                     PedroComponent.follower().followPath(autoInfoManager.pathFifth, true);
                     pathStage = 5;
@@ -172,7 +165,7 @@ public class MainAutonomous extends NextFTCOpMode {
                     autoDrivetrain.track();
                     HoodedShooter.INSTANCE.shooter.setState(true);
                     new Delay(100);
-                    Flicker.INSTANCE.autoFlick(autoInfoManager.currentPattern);
+                    Flicker.INSTANCE.autoFlickMotif(autoInfoManager.currentPattern);
                     HoodedShooter.INSTANCE.shooter.setState(false);
                     PedroComponent.follower().followPath(autoInfoManager.pathEighth, true);
                     pathStage = 8;
@@ -197,18 +190,16 @@ public class MainAutonomous extends NextFTCOpMode {
                     autoDrivetrain.track();
                     HoodedShooter.INSTANCE.shooter.setState(true);
                     new Delay(100);
-                    Flicker.INSTANCE.autoFlick(autoInfoManager.currentPattern);
+                    Flicker.INSTANCE.autoFlickMotif(autoInfoManager.currentPattern);
                     HoodedShooter.INSTANCE.shooter.setState(false);
                     pathStage = 11;
+
                 }
         }
     }
 }
 
 class AutoInfoManager {
-    /* Start Position */
-    public boolean startNearGoal;
-
     /* Alliance */
     public RobotConfig.AllianceName currentAlliance;
 
@@ -239,10 +230,6 @@ class AutoInfoManager {
         if (patternID != -1) {
             currentPattern = patternList[patternID];
         }
-    }
-
-    public void updateStartPosition(boolean StartNearGoal) {
-        startNearGoal = StartNearGoal;
     }
 
     public PathChain pathFirst = PedroComponent.follower().pathBuilder() //go to shoot preload

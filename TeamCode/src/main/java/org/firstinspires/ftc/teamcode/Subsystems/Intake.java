@@ -25,18 +25,21 @@ public class Intake implements Subsystem {
     private final MotorEx motor = new MotorEx(RobotConfig.MOTOR_INTAKE);
     private final double INTAKE_POWER = 1.0;
     private final double REST_POWER = 0.0;
+    public boolean OUTTAKE_MODE;
 
     /* SUBSYSTEM FUNCTIONS */
     @Override
     public void initialize() {
+        OUTTAKE_MODE = false;
         rest();
     }
 
     /* API */
     public void run() {
-        motor.setPower(INTAKE_POWER);
+        if (OUTTAKE_MODE)
+            motor.setPower(-INTAKE_POWER);
+        else motor.setPower(INTAKE_POWER);
     }
-
 
     public void rest() {
         motor.setPower(REST_POWER);

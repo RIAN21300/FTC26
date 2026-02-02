@@ -112,6 +112,10 @@ public class MainTeleOp extends NextFTCOpMode {
                 .whenTrue (Intake.INSTANCE::run)
                 .whenFalse(Intake.INSTANCE::rest);
 
+        button(() -> gamepad2.right_trigger_pressed)
+                .whenTrue (() -> Intake.INSTANCE.OUTTAKE_MODE = true)
+                .whenFalse(() -> Intake.INSTANCE.OUTTAKE_MODE = false);
+
         // FLICKER
         // TOGGLE CYCLE: UpRight = triangle, Left = square, DownRight = cross
         button(() -> gamepad2.triangle)
@@ -120,6 +124,17 @@ public class MainTeleOp extends NextFTCOpMode {
                 .whenBecomesTrue (() -> Flicker.INSTANCE.runArm(RobotConfig.BallSlotName.Left));
         button(() -> gamepad2.cross)
                 .whenBecomesTrue (() -> Flicker.INSTANCE.runArm(RobotConfig.BallSlotName.DownRight));
+
+        // SHOOTER
+        // TOGGLE: left_bumper
+        button(() -> gamepad2.left_bumper)
+                .toggleOnBecomesTrue()
+                .whenTrue (() -> HoodedShooter.INSTANCE.shooter.setState(true))
+                .whenFalse(() -> HoodedShooter.INSTANCE.shooter.setState(false));
+
+        button(() -> gamepad2.left_trigger_pressed)
+                .whenTrue (() -> HoodedShooter.INSTANCE.shooter.FarMode = true)
+                .whenFalse(() -> HoodedShooter.INSTANCE.shooter.FarMode = false);
 
         // TURRET TAG TRACKER
         //button(() -> gamepad2.circle)
@@ -131,13 +146,9 @@ public class MainTeleOp extends NextFTCOpMode {
         PedroComponent.follower().update();
         BindingManager.update();
 
-        // SHOOTER
-        // PUSH: Shooter state (ON/OFF) equals to gamepad2 left_bumper state
-        if (gamepad2.left_bumper) HoodedShooter.INSTANCE.setShooterState(true);
-
         // TURRET
         // ANALOG: gamepad2 left stick x
-        HoodedShooter.INSTANCE.setTurretRotateSpeed(-gamepad2.left_stick_x);
+//        HoodedShooter.INSTANCE.turret.setRotateSpeed(-gamepad2.left_stick_x);
 
         // DEBUG
         telemetry.addData("\nCurrent Alliance", currentAlliance);
@@ -177,7 +188,7 @@ public class MainTeleOp extends NextFTCOpMode {
     public void onStop() {
         BindingManager.reset();
 
-        HoodedShooter.INSTANCE.setShooterState(false);
+        HoodedShooter.INSTANCE.shooter.setState(false);
 
         Intake.INSTANCE.rest();
     }
